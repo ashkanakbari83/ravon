@@ -1,0 +1,10 @@
+export const STATE_VERSION = 1
+export const STATUSES = ['queued', 'active', 'review', 'delivered', 'cancelled']
+export const OPEN_STATUSES = ['queued', 'active', 'review']
+export const ITEM_STATUSES = ['todo', 'doing', 'done']
+export const SERVICES = ['video', 'reels', 'youtube', 'motion', 'cover', 'color', 'podcast', 'content', 'other']
+export const THEMES = ['system', 'light', 'dark']
+export const MAX_AMOUNT = 999_999_999_999
+export const MAX_ENTRY_MINUTES = 24 * 60
+export const SOON_DAYS = 7
+export const BACKUP_REMINDER_DAYS = 14

@@ -1,0 +1,15 @@
+/* آخرین لایه: لمس نهایی */
+h1, h2 { text-wrap: balance; }
+strong { font-weight: 800; }
+::selection { background: var(--brand-soft); }
+@media (max-width: 360px) {
+  .main { padding-inline: var(--s3); }
+  .owed__number { font-size: 2.5rem; }
+  .stat__value, .headline__value { font-size: var(--fs-l); }
+  .card { padding: var(--s3); }
+  .row__link, .row__foot { padding-inline: var(--s3); }
+  .trio dd { font-size: var(--fs-s); }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metrics .stat:nth-child(3) { border-inline-start: 0; }
+  .metrics .stat:nth-child(n + 3) { border-top: 1px solid var(--line); }
+}

@@ -1,0 +1,5 @@
+export const ok = (db, extra) => ({ ok: true, db, ...extra })
+export const fail = (error) => ({ ok: false, error })
+export const clean = (v, max = 200) => String(v ?? '').trim().replace(/\s+/g, ' ').slice(0, max)
+export const cleanNote = (v) => String(v ?? '').trim().slice(0, 4000)
+export const replaceById = (list, id, next) => list.map((x) => (x.id === id ? next : x))
