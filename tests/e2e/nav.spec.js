@@ -82,7 +82,7 @@ test('مسیر نامعتبر و مورد حذف‌شده', async ({ page }) => 
     await expect(page.getByRole('heading', { name: 'این صفحه پیدا نشد' })).toBeVisible()
   }
   await page.getByRole('link', { name: 'برو به خلاصه' }).click()
-  await expect(page.getByRole('heading', { name: 'خط تحویل' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'مهلت تحویل' })).toBeVisible()
 })
 
 test('دکمه‌ی برگشت مرورگر و برگه‌ها', async ({ page }) => {

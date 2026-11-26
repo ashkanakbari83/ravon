@@ -56,7 +56,7 @@ test('مبلغ پیشنهادی و بیعانه', async ({ page }) => {
   expect((await state(page)).payments.map((p) => p.amount)).toEqual([300_000])
 })
 
-test('تحویل از خط تحویل، برگردون، و دریافت از فهرست', async ({ page }) => {
+test('تحویل از فهرست مهلت، برگردون، و دریافت از فهرست', async ({ page }) => {
   await startFresh(page)
   await page.locator('.nav__new').click()
   await sheet(page).getByLabel('عنوان').fill('تیزر')
@@ -67,9 +67,9 @@ test('تحویل از خط تحویل، برگردون، و دریافت از ف
   await sheet(page).getByRole('button', { name: 'فردا' }).click()
   await sheet(page).getByRole('button', { name: 'ثبت پروژه' }).click()
   await page.getByRole('button', { name: '«تیزر» تحویل شد' }).click()
-  await expect(page.locator('.timeline li')).toHaveCount(0)
+  await expect(page.locator('.duelist li')).toHaveCount(0)
   await toast(page).getByRole('button', { name: 'برگردون' }).click()
-  await expect(page.locator('.timeline li')).toHaveCount(1)
+  await expect(page.locator('.duelist li')).toHaveCount(1)
   expect((await state(page)).projects[0]).toMatchObject({ status: 'active', deliveredOn: null })
 
   await go(page, 'projects?filter=unsettled')
@@ -134,7 +134,7 @@ test('برگشت از جزئیات: همون فیلتر و همون‌جای ف�
 
 test('لینک برگشت وقتی از جای دیگه اومده، به فهرست خودش می‌ره', async ({ page }) => {
   await startDemo(page)
-  await page.locator('.timeline .clip').first().click()
+  await page.locator('.duelist__link').first().click()
   await page.locator('.back').click()
   await expect(page).toHaveURL(/#\/projects$/)
 })

@@ -3,7 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { bundles, messages, translate } from '../../src/i18n/index.js'
-import { ITEM_STATUSES, SERVICES, STATUSES, THEMES } from '../../src/lib/domain/constants.js'
+import { ACCENTS, ITEM_STATUSES, SERVICES, STATUSES, THEMES } from '../../src/lib/domain/constants.js'
 import { DUE_GROUPS, FILTERS } from '../../src/lib/domain/projects.js'
 import { RANGES } from '../../src/lib/domain/reports.js'
 
@@ -39,6 +39,7 @@ test('کلیدهای ساخته‌شده در زمان اجرا', () => {
     service: SERVICES,
     item: ITEM_STATUSES,
     'settings.theme': THEMES,
+    'settings.accent': ACCENTS,
     'projects.filter': FILTERS,
     group: DUE_GROUPS,
     'clients.filter': ['all', 'owed'],

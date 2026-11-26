@@ -81,12 +81,16 @@ for (const [name, options] of Object.entries(VIEWS)) {
     await go('clients?filter=owed')
     await shot('12-clients-owed', false)
     await go('')
-    await page.locator('.clip__done').first().click()
+    await page.locator('.duelist__done').first().click()
     await shot('13-undo', false)
     await page.locator('.nav__new').click()
     await page.getByLabel('عنوان').fill('تیزر تازه')
     await page.getByRole('button', { name: 'ثبت پروژه' }).click()
     await shot('14-error', false)
+    await page.keyboard.press('Escape')
+    await go('settings')
+    await page.getByRole('button', { name: 'تازه‌های رَوون' }).click()
+    await shot('15-news', false)
     await context.close()
   }
 }

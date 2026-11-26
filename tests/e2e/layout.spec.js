@@ -59,19 +59,27 @@ for (const width of [320, 390, 1280]) {
   })
 }
 
-test('RTL واقعی و کنتراست متن‌های اصلی در هر دو پوسته', async ({ page }) => {
+test('RTL واقعی و کنتراست متن‌ها با هر رنگ، در هر دو پوسته', async ({ page }) => {
+  test.slow()
   await startDemo(page)
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
-  for (const scheme of ['light', 'dark']) {
+  const looks = ['light', 'dark'].flatMap((scheme) => ['indigo', 'teal', 'plum', 'graphite'].map((accent) => [scheme, accent]))
+  for (const [scheme, accent] of looks) {
     await page.emulateMedia({ colorScheme: scheme })
-    for (const path of PAGES) {
+    await page.evaluate((a) => (document.documentElement.dataset.accent = a), accent)
+    // همه‌ی صفحه‌ها با رنگ پیش‌فرض؛ بقیه‌ی رنگ‌ها جاهایی که برند دیده می‌شه
+    for (const path of accent === 'indigo' ? PAGES : ['', 'projects', 'settings', 'reports']) {
       await go(page, path)
       const low = await page.evaluate(() => {
         const parse = (c) => (c.match(/[\d.]+/g) || []).map(Number)
         const lum = ([r, g, b]) => [r, g, b].map((v) => v / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0)
         const background = (el) => {
           for (let n = el; n; n = n.parentElement) {
-            const c = parse(getComputedStyle(n).backgroundColor)
+            const style = getComputedStyle(n)
+            // کارت‌های گرادیانی: اولین رنگ (روشن‌تر) سخت‌ترین حالته
+            const stop = style.backgroundImage.startsWith('linear-gradient') && style.backgroundImage.match(/rgb\([^)]+\)/)?.[0]
+            if (stop) return parse(stop)
+            const c = parse(style.backgroundColor)
             if (c.length && (c[3] ?? 1) > 0.9) return c
           }
           return parse(getComputedStyle(document.body).backgroundColor)
@@ -84,7 +92,7 @@ test('RTL واقعی و کنتراست متن‌های اصلی در هر دو �
             return ratio < 4.5 ? [`${el.className} ${el.textContent.trim().slice(0, 20)} ${ratio.toFixed(2)}`] : []
           })
       })
-      expect([...new Set(low)], `${scheme} ${path || 'home'}`).toEqual([])
+      expect([...new Set(low)], `${scheme} ${accent} ${path || 'home'}`).toEqual([])
     }
   }
 })
