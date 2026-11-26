@@ -25,6 +25,11 @@ export function parseAmount(text) {
   return Number(digits)
 }
 
+/** لینک‌های http(s) داخل یادداشت */
+export const extractLinks = (text) => [
+  ...new Set((String(text).match(/https?:\/\/[^\s<>"'،]+/g) || []).map((u) => u.replace(/[.,;:!?)\]]+$/, ''))),
+]
+
 export const CURRENCIES = {
   toman: { fa: 'تومان', en: 'Toman' },
   rial: { fa: 'ریال', en: 'Rial' },
