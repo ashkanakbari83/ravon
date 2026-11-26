@@ -4,15 +4,15 @@
 .skip:focus { top: var(--s3); }
 .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; height: 56px; padding-inline: var(--s4) var(--s2); padding-top: env(safe-area-inset-top); box-sizing: content-box; background: var(--bg); }
 .topbar__brand, .nav__brand { display: flex; align-items: center; gap: var(--s2); color: var(--ink); font-weight: 900; font-size: var(--fs-l); min-height: var(--tap); }
-.logo__bg { fill: var(--hero); }
+.logo__bg { fill: var(--hero-2); }
 .logo__tracks { fill: none; stroke: var(--hero-ink-2); stroke-width: 3; stroke-linecap: round; }
 .logo__head { stroke: var(--hero-rest); stroke-width: 2; stroke-linecap: round; }
-.main { width: 100%; max-width: 1120px; margin-inline: auto; padding: var(--s2) var(--s4) calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--s6)); }
+.main { --gutter: var(--s4); width: 100%; max-width: 1120px; margin-inline: auto; padding: var(--s2) var(--s4) calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--s6)); }
 .shell--timer .main { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 96px); }
 
 .nav { position: fixed; z-index: 20; inset-inline: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); height: calc(var(--nav-h) + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); background: var(--surface); border-top: 1px solid var(--line); }
 .nav__brand, .nav__settings, .nav__newLong { display: none; }
-.nav__tab, .nav__new { display: grid; justify-items: center; align-content: center; gap: 2px; color: var(--ink-2); font-size: 0.7rem; font-weight: 600; line-height: 1.4; white-space: nowrap; }
+.nav__tab, .nav__new { display: grid; justify-items: center; align-content: center; gap: 2px; color: var(--ink-2); font-size: 0.75rem; font-weight: 600; line-height: 1.4; white-space: nowrap; }
 .nav__tab[aria-current='page'] { color: var(--brand); font-weight: 800; }
 .nav__plus { display: grid; place-items: center; width: 48px; height: 34px; border-radius: var(--r-m); background: var(--brand); color: var(--brand-ink); }
 .nav__new { color: var(--brand); font-weight: 800; }
@@ -29,32 +29,48 @@
 .page-head .page-title { margin: 0; }
 .back { display: inline-flex; align-items: center; gap: var(--s1); min-height: var(--tap); font-size: var(--fs-s); font-weight: 600; }
 
+/* ---------- موبایل و تبلت ---------- */
+.main > .chips--scroll { margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter) 32px; }
+@media (max-width: 899px), (max-height: 499px) {
+  .main { max-width: 640px; padding-inline: max(var(--gutter), env(safe-area-inset-left), env(safe-area-inset-right)); }
+  .topbar { padding-inline: max(var(--s4), env(safe-area-inset-right)) max(var(--s2), env(safe-area-inset-left)); }
+  .nav { padding-inline: max(env(safe-area-inset-left), (100% - 640px) / 2); }
+}
+/* وقتی کیبورد بازه، نوار پایین جا نمی‌گیره. برگشتنش کمی تأخیر داره تا لمسِ دکمه‌ی
+   پایین صفحه (که فوکوس رو از فیلد می‌گیره) به نوار نخوره؛ برای همین !important داره. */
+@media (pointer: coarse) and (max-width: 899px) {
+  .shell .nav, .shell .timerbar { transition: visibility 0s 0.4s !important; }
+  .shell:has(.main :is(textarea, input:not([type='file'])):focus) :is(.nav, .timerbar) { visibility: hidden; transition-delay: 0s !important; }
+}
+
 /* ---------- خلاصه ---------- */
 .dash { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
-.owed { background: var(--hero); border-color: transparent; color: var(--hero-ink); gap: var(--s2); }
+.owed { background: linear-gradient(155deg, var(--hero-2), var(--hero) 75%); border-color: transparent; color: var(--hero-ink); gap: var(--s2); }
 .owed h2 { color: var(--hero-ink-2); font-weight: 600; font-size: var(--fs-s); }
 .owed__value { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--s2); color: inherit; }
 .owed__number { font-size: var(--fs-2xl); font-weight: 900; line-height: 1.25; }
 .owed__unit { font-size: var(--fs-l); font-weight: 600; color: var(--hero-ink-2); }
 .owed .moneybar { height: 12px; margin-top: var(--s2); }
 .owed .moneybar__paid { background: var(--hero-paid); }
-.owed .moneybar__rest { background: repeating-linear-gradient(-45deg, var(--hero-rest) 0 2px, transparent 2px 5px), var(--hero-rest-soft); }
-.legend { display: flex; justify-content: space-between; gap: var(--s3); font-size: var(--fs-s); }
-.legend div { display: flex; align-items: center; gap: 6px; }
-.legend dt { color: var(--hero-ink-2); }
-.legend dd { font-weight: 800; }
-.legend__paid::before { content: ''; width: 10px; height: 10px; border-radius: 3px; background: var(--hero-paid); }
-.counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); }
-.counts .stat + .stat { border-inline-start: 1px solid var(--line); }
+.owed .moneybar__rest { background: var(--hero-track); }
+.owed__share { font-size: var(--fs-s); color: var(--hero-ink-2); }
+.counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s2); }
+.counts .stat { min-height: 76px; background: var(--surface); border: 1px solid var(--edge); border-radius: var(--r-m); box-shadow: var(--lift); }
+.counts .stat--active { background: var(--brand-soft); box-shadow: none; }
+.counts .stat--bad { background: var(--bad-soft); box-shadow: none; }
+.counts .stat--ok { background: var(--ok-soft); box-shadow: none; }
+.counts .stat--active .stat__label { color: var(--ink); }
+.counts .stat--ok .stat__label { color: var(--ink); }
 .month__stats { display: grid; grid-template-columns: 1.3fr 1fr 1fr; }
-.dash__timeline { gap: var(--s2); }
 
 /* ---------- پروژه‌ها و کارفرماها ---------- */
 .toolbar { display: flex; gap: var(--s2); margin-bottom: var(--s3); }
 .search { display: flex; align-items: center; gap: var(--s2); flex: 1 1 0; min-width: 0; min-height: 48px; padding-inline: var(--s3); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-m); color: var(--ink-2); }
 .search:focus-within { outline: 3px solid var(--brand); outline-offset: 0; }
 .search input { flex: 1; min-width: 0; border: 0; background: none; outline: none; color: var(--ink); font-size: 1rem; min-height: var(--tap); text-overflow: ellipsis; }
-.toolbar .select { flex: none; width: 128px; border-color: var(--line); font-size: var(--fs-s); text-overflow: ellipsis; }
+/* زیر ۱۶px، iOS موقع انتخاب زوم می‌کنه */
+.toolbar .select { flex: none; width: 140px; border-color: var(--line); text-overflow: ellipsis; appearance: none; padding-inline-end: 30px; background: linear-gradient(45deg, transparent 50%, var(--ink-2) 50%) left 12px center / 5px 5px no-repeat, linear-gradient(135deg, var(--ink-2) 50%, transparent 50%) left 17px center / 5px 5px no-repeat, var(--surface); }
+[dir='ltr'] .toolbar .select { background-position: right 17px center, right 12px center, 0 0; }
 .summary { display: flex; justify-content: space-between; gap: var(--s2); margin: var(--s3) var(--s1) var(--s2); font-size: var(--fs-s); color: var(--ink-2); }
 .summary strong { color: var(--wait); }
 .person { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-areas: 'initial name money' 'initial sub money'; align-items: center; column-gap: var(--s3); padding: var(--s3) var(--s4); color: inherit; }
@@ -97,10 +113,10 @@
 .headline h2 { font-size: var(--fs-s); color: var(--ink-2); font-weight: 600; }
 .headline__value { font-size: var(--fs-xl); font-weight: 900; line-height: 1.5; white-space: nowrap; }
 .headline__value small { display: block; font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2); }
-.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); }
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--surface); border: 1px solid var(--edge); box-shadow: var(--lift); border-radius: var(--r-l); }
 .metrics .stat + .stat { border-inline-start: 1px solid var(--line); }
 .metrics .stat { padding-inline: 2px; }
-.linksrow { display: grid; margin-block: var(--s3); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); }
+.linksrow { display: grid; margin-block: var(--s3); background: var(--surface); border: 1px solid var(--edge); box-shadow: var(--lift); border-radius: var(--r-l); }
 .linksrow a { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); min-height: 52px; padding-inline: var(--s4); font-weight: 600; font-size: var(--fs-s); }
 .linksrow a + a { border-top: 1px solid var(--line); }
 .linksrow strong { color: var(--wait); }
@@ -110,6 +126,7 @@
 .share__name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .share__sub { grid-column: 1 / -1; display: flex; flex-wrap: wrap; column-gap: var(--s3); font-size: var(--fs-xs); color: var(--ink-2); }
 .share__owed { color: var(--wait); }
+.share__part { font-weight: 700; color: var(--brand); }
 .share__bar { grid-column: 1 / -1; height: 5px; margin-top: var(--s1); }
 .share__bar span { display: block; height: 100%; min-width: 2px; border-radius: 4px; background: var(--brand); }
 
@@ -117,7 +134,7 @@
 
 /* ---------- خوش‌آمد ---------- */
 .welcome { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: var(--s3); min-height: 100dvh; max-width: 420px; margin-inline: auto; padding: var(--s5) var(--s4); }
-.welcome__art { width: 100%; padding: var(--s4); border-radius: var(--r-l); background: var(--hero); margin-bottom: var(--s3); }
+.welcome__art { width: 100%; padding: var(--s4); border-radius: var(--r-l); background: linear-gradient(155deg, var(--hero-2), var(--hero) 75%); margin-bottom: var(--s3); }
 .welcome__art svg { width: 100%; fill: none; stroke-linecap: round; stroke-width: 14; }
 .w-clip--a { stroke: var(--hero-paid); }
 .w-clip--b { stroke: var(--hero-ink-2); }
@@ -131,7 +148,7 @@
 .welcome__note { font-size: var(--fs-xs); }
 
 /* ---------- دسکتاپ ---------- */
-@media (min-width: 900px) {
+@media (min-width: 900px) and (min-height: 500px) {
   .shell { padding-inline-start: var(--side-w); }
   .topbar { display: none; }
   .nav { inset-block: 0; inset-inline: 0 auto; width: var(--side-w); height: auto; display: flex; flex-direction: column; gap: var(--s1); padding: var(--s4) var(--s3); border-top: 0; border-inline-end: 1px solid var(--line); }
@@ -150,22 +167,19 @@
   .toasts { bottom: var(--s5); inset-inline-start: calc(var(--side-w) + var(--s4)); }
   .shell--timer .toasts { bottom: 100px; }
   .timerbar { inset-inline: auto var(--s5); bottom: var(--s5); width: 420px; }
-  .dash { grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); grid-template-rows: auto auto auto auto 1fr; grid-template-areas: 'owed timeline' 'counts timeline' 'awaiting timeline' 'month timeline' '. timeline'; align-items: start; }
+  .dash { grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); grid-template-rows: auto auto auto auto 1fr; grid-template-areas: 'owed due' 'counts due' 'awaiting due' 'month due' '. due'; align-items: start; }
   .owed { grid-area: owed; }
   .counts { grid-area: counts; }
   .month { grid-area: month; }
   .awaiting { grid-area: awaiting; }
-  .dash__timeline { grid-area: timeline; }
+  .dash__due { grid-area: due; }
   .rows--grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .clip { grid-template-columns: 170px 84px minmax(0, 1fr); grid-template-areas: 'title due track' 'client due track'; align-items: center; column-gap: var(--s3); }
-  .clip__title { max-width: none; }
-  .timeline__ruler { margin-inline-start: calc(var(--tap) + var(--s1) + 170px + 84px + 2 * var(--s3)); }
   .stepbar .btn { flex: 0 1 280px; }
 }
 
 /* راهنمای میانبرها فقط جایی که کیبورد و موس هست */
-@media (min-width: 900px) and (hover: hover) {
+@media (min-width: 900px) and (min-height: 500px) and (hover: hover) {
   .nav .kbd { display: inline-block; }
   .search .kbd { display: inline-block; flex: none; }
   .search:focus-within .kbd { display: none; }

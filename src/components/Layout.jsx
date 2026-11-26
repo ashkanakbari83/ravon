@@ -1,4 +1,5 @@
 import { useApp } from '../context/AppContext.jsx'
+import { useAppUpdate } from '../hooks/useAppUpdate.js'
 import { href } from '../hooks/useRoute.js'
 import { useNow } from '../hooks/useNow.js'
 import { useStopTimer } from '../hooks/useStopTimer.js'
@@ -68,11 +69,18 @@ function TimerBar() {
 }
 
 function Toasts() {
-  const { toasts, dismissToast, sheet } = useApp()
+  const { t, toasts, dismissToast, sheet } = useApp()
+  const update = useAppUpdate()
   // خطاهای داخل برگه، توی خود برگه نشون داده می‌شن
   const visible = sheet ? toasts.filter((x) => x.tone !== 'bad') : toasts
   return (
     <div className="toasts" role="status" aria-live="polite">
+      {update.ready && (
+        <div className="toast toast--update">
+          <span>{t('news.updateReady')}</span>
+          <button type="button" onClick={update.apply}>{t('news.update')}</button>
+        </div>
+      )}
       {visible.map((x) => (
         <div key={x.id} className={`toast toast--${x.tone}`}>
           <span>{x.message}</span>

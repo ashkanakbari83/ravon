@@ -23,6 +23,7 @@ function Money({ amount }) {
 function Breakdown({ title, list, name, link }) {
   const { t, fmt } = useApp()
   const max = Math.max(...list.map((g) => g.received), 1)
+  const total = list.reduce((sum, g) => sum + g.received, 0) || 1
   return (
     <section className="card">
       <h2>{title}</h2>
@@ -34,6 +35,7 @@ function Breakdown({ title, list, name, link }) {
                 <span className="share__name">{name(g.key)}</span>
                 <strong className="share__value">{fmt.compact(g.received)}</strong>
                 <span className="share__sub">
+                  <span className="share__part">{t('reports.shareOf', { percent: fmt.percent(g.received / total) })}</span>
                   <span>{t('reports.deliveredN', { n: g.delivered })}</span>
                   {g.minutes > 0 && <span>{t('reports.hoursN', { n: fmt.hours(g.minutes) })}</span>}
                   {g.outstanding > 0 && <span className="share__owed">{t('projects.owed', { amount: fmt.compact(g.outstanding) })}</span>}

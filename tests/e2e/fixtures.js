@@ -20,7 +20,7 @@ export async function startFresh(page) {
 export async function startDemo(page, name = 'اول با داده‌ی نمونه ببینم') {
   await page.goto('./')
   await page.getByRole('button', { name }).click()
-  await expect(page.getByRole('heading', { name: 'خط تحویل' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'مهلت تحویل' })).toBeVisible()
 }
 
 export const state = (page) => page.evaluate(() => JSON.parse(localStorage.getItem('ravon:state')))

@@ -1,10 +1,11 @@
 import { localizeDigits } from '../lib/format.js'
 import common from './messages.js'
 import money from './messagesMoney.js'
+import news from './messagesNews.js'
 import projects from './messagesProjects.js'
 import system from './messagesSystem.js'
 
-export const bundles = [common, projects, money, system]
+export const bundles = [common, projects, money, system, news]
 export const messages = Object.assign({}, ...bundles)
 
 export function translate(locale, key, vars) {

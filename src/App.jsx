@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect } from 'react'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import Layout from './components/Layout.jsx'
 import { useApp } from './context/AppContext.jsx'
+import { LATEST_RELEASE } from './data/releases.js'
 import { scrollTarget, useRoute } from './hooks/useRoute.js'
 import { useShortcuts } from './hooks/useShortcuts.js'
 import Sheets from './modals/Sheets.jsx'
@@ -35,6 +36,11 @@ export default function App() {
   const welcome = !db.meta.onboarded && !db.projects.length && !storageError
   const quickAdd = useCallback(() => openSheet('quickAdd'), [openSheet])
   useShortcuts({ enabled: !welcome, onNew: quickAdd })
+
+  // بعد از به‌روزرسانی، یک بار موقع باز شدن (باید بعد از افکتِ بستنِ برگه بمونه)
+  useEffect(() => {
+    if (!welcome && !storageError && db.meta.seenRelease < LATEST_RELEASE) openSheet('whatsNew')
+  }, [])
 
   if (welcome) return <Welcome />
   return (

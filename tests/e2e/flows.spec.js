@@ -70,7 +70,7 @@ test('جزئیات بیشتر: ددلاین از تقویم شمسی و یادد
   const [project] = (await state(page)).projects
   expect(project.dueDate).toMatch(/^\d{4}-\d\d-\d\d$/)
   expect(project.note).toBe('فایل‌ها توی درایو')
-  await expect(page.locator('.timeline li')).toHaveCount(1)
+  await expect(page.locator('.duelist li')).toHaveCount(1)
 })
 
 test('چرخه‌ی کامل پروژه: پرداخت، وضعیت، خروجی، اصلاح، کپی، آرشیو، حذف', async ({ page }) => {
@@ -302,7 +302,7 @@ test.describe('آفلاین', () => {
     await page.reload()
     await context.setOffline(true)
     await page.reload()
-    await expect(page.getByRole('heading', { name: 'خط تحویل' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'مهلت تحویل' })).toBeVisible()
     await go(page, 'reports')
     await expect(page.getByRole('heading', { name: 'دریافتی ماهانه' })).toBeVisible()
   })

@@ -2,10 +2,12 @@ import { useRef } from 'react'
 import Icon from '../components/Icon.jsx'
 import { Chips } from '../components/ui.jsx'
 import { useApp } from '../context/AppContext.jsx'
+import { RELEASES } from '../data/releases.js'
 import { useInstall } from '../hooks/useInstall.js'
 import { markBackup, parseBackup, serializeBackup } from '../lib/domain/backup.js'
-import { THEMES } from '../lib/domain/constants.js'
+import { ACCENTS, THEMES } from '../lib/domain/constants.js'
 import { loadDemo, removeDemo } from '../lib/domain/demo.js'
+import { markReleasesSeen } from '../lib/domain/releases.js'
 import { CURRENCIES } from '../lib/format.js'
 import { downloadFile } from '../lib/download.js'
 
@@ -31,7 +33,8 @@ export default function Settings() {
       title: t('settings.restore'),
       text: t('settings.restoreConfirm', { n: result.db.projects.length }),
       action: t('settings.restoreDo'),
-      onConfirm: () => (commit(result.db), toast(t('settings.restored'))),
+      // پشتیبان قدیمی نباید «تازه‌ها»ی دیده‌شده رو دوباره بیاره
+      onConfirm: () => (commit(markReleasesSeen(result.db, db.meta.seenRelease).db), toast(t('settings.restored'))),
     })
   }
   const demo = (level) => run(loadDemo, level, ctx()).ok && toast(t('settings.demoLoaded'))
@@ -43,6 +46,16 @@ export default function Settings() {
         <section className="card">
           <h2>{t('settings.look')}</h2>
           <Chips label={t('settings.look')} value={db.settings.theme} onChange={(v) => setting('theme', v)} options={THEMES.map((v) => ({ value: v, label: t(`settings.theme.${v}`) }))} />
+          <h2>{t('settings.accent')}</h2>
+          <Chips label={t('settings.accent')} value={db.settings.accent} onChange={(v) => setting('accent', v)} options={ACCENTS.map((v) => ({
+            value: v,
+            label: (
+              <>
+                <span className="swatch" data-accent={v} aria-hidden="true" />
+                {t(`settings.accent.${v}`)}
+              </>
+            ),
+          }))} />
           <h2>{t('settings.currency')}</h2>
           <Chips label={t('settings.currency')} value={db.settings.currency} onChange={(v) => setting('currency', v)} options={Object.entries(CURRENCIES).map(([v, c]) => ({ value: v, label: c[locale] }))} />
           <p className="muted">{t('settings.currencyHint')}</p>
@@ -74,6 +87,12 @@ export default function Settings() {
             <button type="button" className="btn" aria-pressed={db.meta.demo === 'busy'} onClick={() => demo('busy')}>{t('settings.demoBusy')}</button>
           </div>
           {db.meta.demo && <button type="button" className="btn btn--block" onClick={() => run(removeDemo).ok && toast(t('settings.demoRemoved'))}>{t('settings.demoRemove')}</button>}
+        </section>
+        <section className="card">
+          <div className="setting">
+            <button type="button" className="link" onClick={() => openSheet('whatsNew', { all: true })}>{t('news.open')}</button>
+            <span className="muted">{t('news.version', { version: fmt.digits(RELEASES[0].version) })}</span>
+          </div>
         </section>
         <button type="button" className="link link--danger" onClick={() => openSheet('confirm', { title: t('settings.wipe'), text: t('settings.wipeConfirm'), action: t('settings.wipe'), onConfirm: () => (wipe(), toast(t('settings.wiped'))) })}>
           {t('settings.wipe')}

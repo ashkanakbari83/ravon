@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
+import DueList from '../components/DueList.jsx'
 import Icon from '../components/Icon.jsx'
-import Timeline from '../components/Timeline.jsx'
 import { EmptyState, MoneyBar, Stat } from '../components/ui.jsx'
 import { useApp } from '../context/AppContext.jsx'
 import { href } from '../hooks/useRoute.js'
@@ -11,7 +11,7 @@ import { downloadFile } from '../lib/download.js'
 import { MONTHS } from '../lib/format.js'
 import { isoToJalali } from '../lib/jalali.js'
 
-const TIMELINE_ROWS = 5
+const DUE_ROWS = 5
 
 function BackupReminder() {
   const { db, t, today, run, ctx, toast } = useApp()
@@ -66,24 +66,23 @@ export default function Dashboard() {
             <span className="owed__unit">{owed.unit} {fmt.currency}</span>
           </a>
           <MoneyBar paid={stats.received} total={stats.agreed} />
-          <dl className="legend">
-            <div className="legend__paid"><dt>{t('money.received')}</dt><dd>{fmt.compact(stats.received)}</dd></div>
-            <div className="legend__total"><dt>{t('money.agreed')}</dt><dd>{fmt.compact(stats.agreed)}</dd></div>
-          </dl>
+          <p className="owed__share">
+            {t('dash.receivedShare', { percent: fmt.percent(stats.agreed ? Math.floor((stats.received / stats.agreed) * 100) / 100 : 0), total: fmt.short(stats.agreed) })}
+          </p>
         </section>
 
         <div className="counts">
-          <Stat label={t('dash.active')} value={fmt.num(stats.activeCount)} to="projects?filter=open" />
+          <Stat label={t('dash.active')} value={fmt.num(stats.activeCount)} to="projects?filter=open" tone="active" />
           <Stat label={t('dash.overdue')} value={fmt.num(stats.overdue.length)} to="projects?filter=open" tone={stats.overdue.length ? 'bad' : undefined} />
-          <Stat label={t('dash.delivered')} value={fmt.num(stats.deliveredCount)} to="projects?filter=delivered" />
+          <Stat label={t('dash.delivered')} value={fmt.num(stats.deliveredCount)} to="projects?filter=delivered" tone="ok" />
         </div>
 
-        <section className="card dash__timeline" aria-labelledby="tl-title">
-          <h2 id="tl-title">{t('dash.timeline')}</h2>
-          {stats.dated.length ? <Timeline rows={stats.dated.slice(0, TIMELINE_ROWS)} /> : <p className="muted">{t('dash.timelineEmpty')}</p>}
-          {(stats.dated.length > TIMELINE_ROWS || stats.undatedCount > 0) && (
+        <section className="card dash__due" aria-labelledby="due-title">
+          <h2 id="due-title">{t('dash.due')}</h2>
+          {stats.dated.length ? <DueList rows={stats.dated.slice(0, DUE_ROWS)} /> : <p className="muted">{t('dash.dueEmpty')}</p>}
+          {(stats.dated.length > DUE_ROWS || stats.undatedCount > 0) && (
             <p className="card__foot">
-              {stats.dated.length > TIMELINE_ROWS && <a href={href('projects?filter=open')}>{t('dash.timelineMore', { n: stats.dated.length - TIMELINE_ROWS })}</a>}
+              {stats.dated.length > DUE_ROWS && <a href={href('projects?filter=open')}>{t('dash.dueMore', { n: stats.dated.length - DUE_ROWS })}</a>}
               {stats.undatedCount > 0 && <a href={href('projects?filter=open')}>{t('dash.undated', { n: stats.undatedCount })}</a>}
             </p>
           )}

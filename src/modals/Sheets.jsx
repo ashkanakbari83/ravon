@@ -6,6 +6,7 @@ import ProjectEdit from './ProjectEdit.jsx'
 import QuickAdd from './QuickAdd.jsx'
 import StatusSheet from './StatusSheet.jsx'
 import TimeSheet, { TimerConfirm } from './TimeSheet.jsx'
+import WhatsNew from './WhatsNew.jsx'
 
 const SHEETS = {
   quickAdd: QuickAdd,
@@ -16,6 +17,7 @@ const SHEETS = {
   projectEdit: ProjectEdit,
   client: ClientSheet,
   confirm: ConfirmSheet,
+  whatsNew: WhatsNew,
 }
 
 export default function Sheets() {

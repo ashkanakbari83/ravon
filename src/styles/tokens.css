@@ -1,37 +1,58 @@
+/* رنگ‌ها فقط این‌جا. هر «رنگ برنامه» فقط خانواده‌ی برند رو عوض می‌کنه؛ رنگ وضعیت‌ها ثابتن. */
+:root, :root[data-accent='indigo'], .swatch[data-accent='indigo'] {
+  --l-brand: #4b3fd1; --l-brand-ink: #ffffff; --l-brand-soft: #ecebfd; --l-hero: #262079; --l-hero-2: #4b3fd1; --l-hero-ink-2: #d3d0fa;
+  --d-brand: #ada7ff; --d-brand-ink: #17123f; --d-brand-soft: #29265a; --d-hero: #27216e; --d-hero-2: #3d35a8; --d-hero-ink-2: #d3d0fa;
+}
+:root[data-accent='teal'], .swatch[data-accent='teal'] {
+  --l-brand: #0a6c74; --l-brand-ink: #ffffff; --l-brand-soft: #dff1f2; --l-hero: #06414a; --l-hero-2: #0a6c74; --l-hero-ink-2: #c3e8ea;
+  --d-brand: #5ed2d6; --d-brand-ink: #032a2e; --d-brand-soft: #113238; --d-hero: #083a42; --d-hero-2: #0d5e68; --d-hero-ink-2: #c3e8ea;
+}
+:root[data-accent='plum'], .swatch[data-accent='plum'] {
+  --l-brand: #6a2c91; --l-brand-ink: #ffffff; --l-brand-soft: #f1e7f8; --l-hero: #3d1b59; --l-hero-2: #6a2c91; --l-hero-ink-2: #e2d0ef;
+  --d-brand: #cba5f0; --d-brand-ink: #210f34; --d-brand-soft: #33224b; --d-hero: #341f4f; --d-hero-2: #54307a; --d-hero-ink-2: #e2d0ef;
+}
+:root[data-accent='graphite'], .swatch[data-accent='graphite'] {
+  --l-brand: #252a3d; --l-brand-ink: #ffffff; --l-brand-soft: #e8eaf1; --l-hero: #161927; --l-hero-2: #353b55; --l-hero-ink-2: #cfd2e0;
+  --d-brand: #d8dbea; --d-brand-ink: #151826; --d-brand-soft: #2c3043; --d-hero: #222639; --d-hero-2: #3a405c; --d-hero-ink-2: #cfd2e0;
+}
+
 :root {
   color-scheme: light;
-  --bg: #f4f3f7;
+  --bg: #f4f5fa;
   --surface: #ffffff;
-  --surface-2: #efedf4;
-  --ink: #1b1724;
-  --ink-2: #5d576d;
-  --line: #e2dfe9;
-  --line-strong: #8b84a0;
-  --brand: #542878;
-  --brand-ink: #ffffff;
-  --brand-soft: #eee6f6;
-  --hero: #3e1d5c;
+  --surface-2: #edeff6;
+  --ink: #151827;
+  --ink-2: #535970;
+  --line: #e5e7f0;
+  --line-strong: #848aa3;
+  --edge: transparent;
+  --lift: 0 1px 2px rgb(24 28 61 / 0.05), 0 6px 20px rgb(24 28 61 / 0.06);
+  --brand: var(--l-brand);
+  --brand-ink: var(--l-brand-ink);
+  --brand-soft: var(--l-brand-soft);
+  --hero: var(--l-hero);
+  --hero-2: var(--l-hero-2);
   --hero-ink: #ffffff;
-  --hero-ink-2: #d5c5e6;
-  --hero-paid: #63d69c;
-  --hero-rest: #ffc061;
-  --hero-rest-soft: #8a6368;
-  --ok: #12704a;
-  --ok-soft: #e0f2e9;
-  --wait: #94520a;
-  --wait-soft: #fcedd6;
-  --info: #1d5aad;
-  --info-soft: #e3edfb;
-  --bad: #b4271f;
-  --bad-soft: #fbe6e4;
-  --paid-fill: #1f9c68;
-  --rest-fill: #e8920f;
-  --scrim: rgb(23 16 34 / 0.5);
-  --shadow: 0 8px 28px rgb(35 18 55 / 0.14);
+  --hero-ink-2: var(--l-hero-ink-2);
+  --hero-paid: #5fe3ac;
+  --hero-rest: #ffc861;
+  --hero-track: rgb(255 255 255 / 0.2);
+  --ok: #0c7249;
+  --ok-soft: #dcf4e8;
+  --wait: #8f4d00;
+  --wait-soft: #ffeed3;
+  --info: #0364a0;
+  --info-soft: #ddf0fd;
+  --bad: #b8232c;
+  --bad-soft: #fde7e8;
+  --paid-fill: #17a56b;
+  --rest-fill: #ffd591;
+  --scrim: rgb(14 16 34 / 0.55);
+  --shadow: 0 8px 28px rgb(24 28 61 / 0.16);
 
   --font: 'Vazirmatn', system-ui, sans-serif;
-  --fs-xs: 0.75rem;
-  --fs-s: 0.84rem;
+  --fs-xs: 0.78rem;
+  --fs-s: 0.875rem;
   --fs-m: 0.95rem;
   --fs-l: 1.1rem;
   --fs-xl: 1.4rem;
@@ -43,9 +64,9 @@
   --s4: 16px;
   --s5: 24px;
   --s6: 32px;
-  --r-s: 8px;
-  --r-m: 12px;
-  --r-l: 18px;
+  --r-s: 10px;
+  --r-m: 14px;
+  --r-l: 20px;
   --r-pill: 999px;
   --tap: 44px;
   --nav-h: 66px;
@@ -55,59 +76,63 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --bg: #121017;
-    --surface: #1b1823;
-    --surface-2: #252130;
-    --ink: #ece9f3;
-    --ink-2: #aea7c0;
-    --line: #302b3d;
-    --line-strong: #736c88;
-    --brand: #bd9aea;
-    --brand-ink: #1d0f2e;
-    --brand-soft: #2f2344;
-    --hero: #34204d;
-    --hero-ink-2: #c9b7df;
-    --hero-rest-soft: #75525c;
-    --ok: #66d29c;
-    --ok-soft: #153023;
-    --wait: #f2b25c;
-    --wait-soft: #382810;
-    --info: #86b5f5;
-    --info-soft: #172742;
-    --bad: #f79089;
-    --bad-soft: #3c1a1a;
-    --paid-fill: #3fc185;
-    --rest-fill: #e6a23c;
-    --scrim: rgb(0 0 0 / 0.65);
+    --bg: #0e1017;
+    --surface: #171a24;
+    --surface-2: #222637;
+    --ink: #eceef7;
+    --ink-2: #a9aec6;
+    --line: #2a2f42;
+    --line-strong: #6f7595;
+    --edge: #272c3d;
+    --lift: none;
+    --ok: #5fd6a0;
+    --ok-soft: #11322a;
+    --wait: #f5b75a;
+    --wait-soft: #392a12;
+    --info: #6cc4f5;
+    --info-soft: #102f45;
+    --bad: #ff938f;
+    --bad-soft: #3f1c21;
+    --paid-fill: #3fc88c;
+    --rest-fill: #6b5226;
+    --brand: var(--d-brand);
+    --brand-ink: var(--d-brand-ink);
+    --brand-soft: var(--d-brand-soft);
+    --hero: var(--d-hero);
+    --hero-2: var(--d-hero-2);
+    --hero-ink-2: var(--d-hero-ink-2);
+    --scrim: rgb(3 4 10 / 0.7);
     --shadow: 0 8px 28px rgb(0 0 0 / 0.5);
   }
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #121017;
-  --surface: #1b1823;
-  --surface-2: #252130;
-  --ink: #ece9f3;
-  --ink-2: #aea7c0;
-  --line: #302b3d;
-  --line-strong: #736c88;
-  --brand: #bd9aea;
-  --brand-ink: #1d0f2e;
-  --brand-soft: #2f2344;
-  --hero: #34204d;
-  --hero-ink-2: #c9b7df;
-  --hero-rest-soft: #75525c;
-  --ok: #66d29c;
-  --ok-soft: #153023;
-  --wait: #f2b25c;
-  --wait-soft: #382810;
-  --info: #86b5f5;
-  --info-soft: #172742;
-  --bad: #f79089;
-  --bad-soft: #3c1a1a;
-  --paid-fill: #3fc185;
-  --rest-fill: #e6a23c;
-  --scrim: rgb(0 0 0 / 0.65);
+  --bg: #0e1017;
+  --surface: #171a24;
+  --surface-2: #222637;
+  --ink: #eceef7;
+  --ink-2: #a9aec6;
+  --line: #2a2f42;
+  --line-strong: #6f7595;
+  --edge: #272c3d;
+  --lift: none;
+  --ok: #5fd6a0;
+  --ok-soft: #11322a;
+  --wait: #f5b75a;
+  --wait-soft: #392a12;
+  --info: #6cc4f5;
+  --info-soft: #102f45;
+  --bad: #ff938f;
+  --bad-soft: #3f1c21;
+  --paid-fill: #3fc88c;
+  --rest-fill: #6b5226;
+  --brand: var(--d-brand);
+  --brand-ink: var(--d-brand-ink);
+  --brand-soft: var(--d-brand-soft);
+  --hero: var(--d-hero);
+  --hero-2: var(--d-hero-2);
+  --hero-ink-2: var(--d-hero-ink-2);
+  --scrim: rgb(3 4 10 / 0.7);
   --shadow: 0 8px 28px rgb(0 0 0 / 0.5);
 }
