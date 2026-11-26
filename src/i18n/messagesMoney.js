@@ -64,7 +64,4 @@ export default {
   'dash.emptyText': ['فقط عنوان، کارفرما، نوع خدمت و مبلغ.', 'Just title, client, service and amount.'],
   'dash.demoNote': ['داری داده‌ی نمونه می‌بینی.', 'You are viewing sample data.'],
   'dash.demoExit': ['پاکش کن', 'Remove it'],
-  'pay.removeConfirm': ['پرداخت {amount} حذف می‌شه.', 'Payment of {amount} will be removed.'],
-  'time.undo': ['برگردون', 'Undo'],
-  'time.removeConfirm': ['{time} حذف می‌شه.', '{time} will be removed.'],
 }

@@ -1,20 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import DateField from '../components/DateField.jsx'
 import Icon from '../components/Icon.jsx'
-import { BackLink, DueTag, dueText, MoneyBar } from '../components/ui.jsx'
+import { BackLink, DueTag, dueText, MoneyBar, StatusButton } from '../components/ui.jsx'
 import { useApp } from '../context/AppContext.jsx'
 import { href, navigate } from '../hooks/useRoute.js'
 import { useStopTimer } from '../hooks/useStopTimer.js'
-import { ITEM_STATUSES, STATUSES } from '../lib/domain/constants.js'
+import { ITEM_STATUSES } from '../lib/domain/constants.js'
 import { removePayment } from '../lib/domain/payments.js'
-import { addItem, changeRevisions, deleteProject, dueInfo, duplicateProject, removeItem, setArchived, setItemStatus, setStatus, updateProject } from '../lib/domain/projects.js'
+import { addItem, changeRevisions, deleteProject, dueInfo, duplicateProject, nextStep, removeItem, setArchived, setItemStatus, updateProject } from '../lib/domain/projects.js'
 import { addTime, removeTime, startTimer } from '../lib/domain/time.js'
+import { restoreItem } from '../lib/domain/undo.js'
+import { extractLinks } from '../lib/format.js'
 import NotFound from './NotFound.jsx'
 
 const byDate = (a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)
 
 function Money({ row }) {
-  const { db, t, fmt, openSheet, run } = useApp()
+  const { db, t, fmt, openSheet, removeWithUndo } = useApp()
   const { project, paid, balance, payState } = row
   const payments = db.payments.filter((x) => x.projectId === project.id).sort(byDate)
   return (
@@ -43,7 +45,7 @@ function Money({ row }) {
                 <span className="line__sub">{fmt.date(x.date)}{x.note && <span className="line__note">{x.note}</span>}</span>
               </span>
               <button type="button" className="iconbtn iconbtn--quiet" aria-label={t('pay.remove', { amount: fmt.money(x.amount) })}
-                onClick={() => openSheet('confirm', { title: t('common.delete'), text: t('pay.removeConfirm', { amount: fmt.money(x.amount) }), action: t('common.delete'), onConfirm: () => run(removePayment, x.id) })}>
+                onClick={() => removeWithUndo(t('pay.removed'), removePayment, x.id)}>
                 <Icon name="trash" size={18} />
               </button>
             </li>
@@ -56,7 +58,7 @@ function Money({ row }) {
 }
 
 function Time({ row }) {
-  const { db, t, fmt, openSheet, run, ctx, toast } = useApp()
+  const { db, t, fmt, openSheet, run, ctx, toast, removeWithUndo, undoAction } = useApp()
   const stop = useStopTimer()
   const [all, setAll] = useState(false)
   const { project, minutes, agreed } = row
@@ -64,7 +66,7 @@ function Time({ row }) {
   const running = db.timer?.projectId === project.id
   const quick = (m) => {
     const result = run(addTime, project.id, { minutes: m }, ctx())
-    if (result.ok) toast(t('time.done', { time: fmt.clock(m) }), { action: { label: t('time.undo'), run: () => run(removeTime, result.id) } })
+    if (result.ok) toast(t('time.done', { time: fmt.clock(m) }), { action: undoAction(removeTime, result.id) })
   }
   return (
     <section className="card" aria-labelledby="time-title">
@@ -99,7 +101,7 @@ function Time({ row }) {
                   <span className="line__sub">{fmt.date(x.date)}<span className="line__note">{x.note || t(x.source === 'timer' ? 'time.fromTimer' : 'time.manual')}</span></span>
                 </span>
                 <button type="button" className="iconbtn iconbtn--quiet" aria-label={t('time.remove', { time: fmt.clock(x.minutes) })}
-                  onClick={() => openSheet('confirm', { title: t('common.delete'), text: t('time.removeConfirm', { time: fmt.clock(x.minutes) }), action: t('common.delete'), onConfirm: () => run(removeTime, x.id) })}>
+                  onClick={() => removeWithUndo(t('time.removed'), removeTime, x.id)}>
                   <Icon name="trash" size={18} />
                 </button>
               </li>
@@ -115,7 +117,10 @@ function Time({ row }) {
 }
 
 function Items({ project }) {
-  const { t, run, ctx } = useApp()
+  const { t, run, ctx, toast, undoAction } = useApp()
+  const remove = (item, index) => {
+    if (run(removeItem, project.id, item.id).ok) toast(t('item.removed'), { action: undoAction(restoreItem, project.id, item, index) })
+  }
   const [title, setTitle] = useState('')
   const done = project.items.filter((i) => i.status === 'done').length
   const next = (s) => ITEM_STATUSES[(ITEM_STATUSES.indexOf(s) + 1) % ITEM_STATUSES.length]
@@ -127,13 +132,13 @@ function Items({ project }) {
       </div>
       {project.items.length > 0 ? (
         <ul className="lines">
-          {project.items.map((i) => (
+          {project.items.map((i, index) => (
             <li key={i.id} className="line">
               <span className="line__main"><span className="line__title">{i.title}</span></span>
               <button type="button" className={`itemstate itemstate--${i.status}`} aria-label={t('item.cycle', { title: i.title, status: t(`item.${i.status}`) })} onClick={() => run(setItemStatus, project.id, i.id, next(i.status))}>
                 <span>{t(`item.${i.status}`)}</span>
               </button>
-              <button type="button" className="iconbtn iconbtn--quiet" aria-label={t('item.remove', { title: i.title })} onClick={() => run(removeItem, project.id, i.id)}><Icon name="close" size={16} /></button>
+              <button type="button" className="iconbtn iconbtn--quiet" aria-label={t('item.remove', { title: i.title })} onClick={() => remove(i, index)}><Icon name="close" size={16} /></button>
             </li>
           ))}
         </ul>
@@ -171,6 +176,13 @@ function NoteField({ project }) {
     <div className="field">
       <label htmlFor="note">{t('f.note')}</label>
       <textarea id="note" className="input" rows={3} value={text} placeholder={t('project.notePh')} onChange={(e) => setText(e.target.value)} onBlur={save} />
+      {extractLinks(text).length > 0 && (
+        <ul className="links" aria-label={t('project.links')}>
+          {extractLinks(text).map((url) => (
+            <li key={url}><a href={url} target="_blank" rel="noopener noreferrer" dir="ltr">{url.replace(/^https?:\/\/(www\.)?/, '')}</a></li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }
@@ -181,6 +193,7 @@ function Details({ project }) {
   return (
     <section className="card" aria-labelledby="details-title">
       <h2 id="details-title">{t('project.details')}</h2>
+      <DateField collapsible label={t('f.due')} value={project.dueDate} onChange={(dueDate) => run(updateProject, project.id, { dueDate })} />
       <div className="counter">
         <span id="rev-label">{t('project.revisions')}</span>
         <div className="counter__control" role="group" aria-labelledby="rev-label">
@@ -189,7 +202,6 @@ function Details({ project }) {
           <button type="button" className="iconbtn" aria-label={t('project.revPlus')} onClick={() => run(changeRevisions, project.id, 1)}><Icon name="plus" /></button>
         </div>
       </div>
-      <DateField label={t('f.due')} value={project.dueDate} onChange={(dueDate) => run(updateProject, project.id, { dueDate })} />
       <NoteField key={project.id} project={project} />
       <p className="muted meta">
         <span>{t('project.createdOn', { date: fmt.date(project.createdOn) })}</span>
@@ -201,7 +213,7 @@ function Details({ project }) {
 }
 
 export default function ProjectDetail({ id }) {
-  const { rows, t, serviceName, openSheet, run, ctx, toast } = useApp()
+  const { rows, t, serviceName, openSheet, run, ctx, toast, changeStatus, removeWithUndo } = useApp()
   const row = rows.find((r) => r.project.id === id)
   if (!row) return <NotFound />
   const { project, client } = row
@@ -214,17 +226,11 @@ export default function ProjectDetail({ id }) {
     }
   }
   const archive = () => run(setArchived, id, !project.archived).ok && toast(t(project.archived ? 'project.unarchived' : 'project.archived'))
-  const remove = () =>
-    openSheet('confirm', {
-      title: t('project.delete'),
-      text: t('project.deleteConfirm', { title: project.title }),
-      action: t('common.delete'),
-      onConfirm: () => {
-        navigate('projects')
-        run(deleteProject, id)
-        toast(t('project.deleted'))
-      },
-    })
+  const remove = () => {
+    navigate('projects')
+    removeWithUndo(t('project.deleted'), deleteProject, id)
+  }
+  const step = nextStep(project)
 
   return (
     <>
@@ -241,19 +247,23 @@ export default function ProjectDetail({ id }) {
         </div>
         <button type="button" className="iconbtn" aria-label={t('project.edit')} onClick={() => openSheet('projectEdit', { projectId: id })}><Icon name="edit" /></button>
       </header>
-      <div className="statusbar" role="group" aria-label={t('f.status')}>
-        {STATUSES.map((s) => (
-          <button key={s} type="button" className={`statusbar__step status--${s}`} aria-pressed={project.status === s} onClick={() => run(setStatus, id, s, ctx())}>{t(`status.${s}`)}</button>
-        ))}
+      <div className="stepbar">
+        <StatusButton project={project} />
+        {step && (
+          <button type="button" className={step.status === 'delivered' ? 'btn btn--primary' : 'btn'} onClick={() => changeStatus(id, step.status)}>
+            {step.status === 'delivered' && <Icon name="check" />}
+            {t(step.label)}
+          </button>
+        )}
       </div>
       <div className="columns">
         <div className="columns__col">
           <Money row={row} />
-          <Time row={row} />
+          <Details project={project} />
         </div>
         <div className="columns__col">
           <Items project={project} />
-          <Details project={project} />
+          <Time row={row} />
           <div className="actions">
             <button type="button" className="btn" onClick={duplicate}><Icon name="copy" />{t('project.duplicate')}</button>
             <button type="button" className="btn" onClick={archive}><Icon name="archive" />{t(project.archived ? 'project.unarchive' : 'project.archive')}</button>

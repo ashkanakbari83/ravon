@@ -4,7 +4,7 @@ import { clientsByRecency, findClientByName, normalizeText } from '../lib/domain
 import { SERVICES } from '../lib/domain/constants.js'
 
 /** یک فیلد برای هر دو کار: انتخاب کارفرمای قبلی یا نوشتن اسم جدید */
-export function ClientPicker({ value, onChange }) {
+export function ClientPicker({ value, onChange, error }) {
   const { db, t } = useApp()
   const id = useId()
   const sorted = useMemo(() => clientsByRecency(db), [db])
@@ -14,7 +14,7 @@ export function ClientPicker({ value, onChange }) {
   return (
     <div className="field">
       <label htmlFor={id}>{t('f.client')}</label>
-      <input id={id} className="input" value={value} placeholder={t('quick.clientPh')} autoComplete="off" maxLength={80} enterKeyHint="next" onChange={(e) => onChange(e.target.value)} />
+      <input id={id} className="input" aria-invalid={error ? true : undefined} value={value} placeholder={t('quick.clientPh')} autoComplete="off" maxLength={80} enterKeyHint="next" onChange={(e) => onChange(e.target.value)} />
       {matches.length > 0 && (
         <div className="chips chips--scroll" role="group" aria-label={t('nav.clients')}>
           {matches.map((c) => (
@@ -25,6 +25,7 @@ export function ClientPicker({ value, onChange }) {
         </div>
       )}
       {query && !exact && <p className="field__hint">{t('quick.newClient', { name: value.trim() })}</p>}
+      {error && <p className="field__error" role="alert">{error}</p>}
     </div>
   )
 }
@@ -39,7 +40,7 @@ export function useServiceOptions() {
   }, [db.projects])
 }
 
-export function ServicePicker({ value, onChange }) {
+export function ServicePicker({ value, onChange, error }) {
   const { t, serviceName } = useApp()
   const options = useServiceOptions()
   const [custom, setCustom] = useState(false)
@@ -61,6 +62,7 @@ export function ServicePicker({ value, onChange }) {
           <button type="button" className="chip chip--ghost" aria-expanded="false" onClick={() => setAll(true)}>{t('service.more')}</button>
         )}
       </div>
+      {error && <p className="field__error" role="alert">{error}</p>}
       {custom && <input className="input" aria-label={t('service.customName')} placeholder={t('service.customName')} autoFocus maxLength={40} value={value} onChange={(e) => onChange(e.target.value)} />}
     </div>
   )

@@ -11,7 +11,7 @@ import { downloadFile } from '../lib/download.js'
 import { MONTHS } from '../lib/format.js'
 import { isoToJalali } from '../lib/jalali.js'
 
-const TIMELINE_ROWS = 6
+const TIMELINE_ROWS = 5
 
 function BackupReminder() {
   const { db, t, today, run, ctx, toast } = useApp()
@@ -89,15 +89,6 @@ export default function Dashboard() {
           )}
         </section>
 
-        <section className="card month" aria-labelledby="month-title">
-          <h2 id="month-title">{t('dash.month', { month })}</h2>
-          <div className="month__stats">
-            <Stat label={t('dash.monthReceived')} value={fmt.compact(stats.monthReceived)} />
-            <Stat label={t('dash.monthHours')} value={fmt.hours(stats.monthMinutes)} />
-            <Stat label={t('dash.monthDelivered')} value={fmt.num(stats.monthDelivered)} />
-          </div>
-        </section>
-
         <section className="card awaiting" aria-labelledby="await-title">
           <h2 id="await-title">{t('dash.awaiting')}</h2>
           {stats.awaiting.length ? (
@@ -117,6 +108,15 @@ export default function Dashboard() {
             <p className="muted">{t('dash.allClear')}</p>
           )}
           {stats.awaiting.length > 4 && <p className="card__foot"><a href={href('projects?filter=unsettled')}>{t('dash.awaitingAll')}</a></p>}
+        </section>
+
+        <section className="card month" aria-labelledby="month-title">
+          <h2 id="month-title">{t('dash.month', { month })}</h2>
+          <div className="month__stats">
+            <Stat label={t('dash.monthReceived')} value={fmt.compact(stats.monthReceived)} />
+            <Stat label={t('dash.monthHours')} value={fmt.hours(stats.monthMinutes)} />
+            <Stat label={t('dash.monthDelivered')} value={fmt.num(stats.monthDelivered)} />
+          </div>
         </section>
       </div>
     </>

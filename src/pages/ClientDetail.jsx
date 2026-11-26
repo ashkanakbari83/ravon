@@ -9,22 +9,15 @@ import { toEnDigits } from '../lib/format.js'
 import NotFound from './NotFound.jsx'
 
 export default function ClientDetail({ id }) {
-  const { db, rows, t, fmt, openSheet, run, toast } = useApp()
+  const { db, rows, t, fmt, openSheet, removeWithUndo } = useApp()
   const client = db.clients.find((c) => c.id === id)
   if (!client) return <NotFound />
   const mine = sortRows(rows.filter((r) => r.project.clientId === id))
   const money = moneyTotals(mine)
-  const remove = () =>
-    openSheet('confirm', {
-      title: t('clients.delete'),
-      text: t('clients.deleteConfirm', { name: client.name }),
-      action: t('common.delete'),
-      onConfirm: () => {
-        navigate('clients')
-        run(deleteClient, id)
-        toast(t('clients.deleted'))
-      },
-    })
+  const remove = () => {
+    navigate('clients')
+    removeWithUndo(t('clients.deleted'), deleteClient, id)
+  }
   return (
     <>
       <BackLink to="clients">{t('nav.clients')}</BackLink>

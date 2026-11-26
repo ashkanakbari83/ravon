@@ -127,6 +127,4 @@ export default {
   'clients.delete': ['حذف کارفرما', 'Delete client'],
   'clients.deleted': ['کارفرما حذف شد', 'Client deleted'],
   'clients.saved': ['ذخیره شد', 'Saved'],
-  'project.deleteConfirm': ['«{title}» با همه‌ی پرداخت‌ها و زمان‌هاش حذف می‌شه. برگشت نداره.', '“{title}” and its payments and time will be deleted.'],
-  'clients.deleteConfirm': ['«{name}» از دفترچه حذف می‌شه.', '“{name}” will be removed.'],
 }
