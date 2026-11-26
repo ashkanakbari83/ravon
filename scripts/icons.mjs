@@ -9,7 +9,7 @@ for (const [name, size, pad] of [['icon-192', 192, 0], ['icon-512', 512, 0], ['i
   await page.setViewportSize({ width: size, height: size })
   const inner = Math.round(size * (1 - pad * 2))
   const art = pad ? svg.replace('rx="9"', 'rx="0"') : svg
-  await page.setContent(`<body style="margin:0;background:${pad ? '#3e1d5c' : 'transparent'};display:grid;place-items:center;height:${size}px">${art.replace('<svg ', `<svg width="${inner}" height="${inner}" `)}</body>`)
+  await page.setContent(`<body style="margin:0;background:${pad ? '#4b3fd1' : 'transparent'};display:grid;place-items:center;height:${size}px">${art.replace('<svg ', `<svg width="${inner}" height="${inner}" `)}</body>`)
   await page.screenshot({ path: `public/${name}.png`, omitBackground: true })
 }
 await browser.close()
