@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { test } from 'node:test'
 import { bundles, messages, translate } from '../../src/i18n/index.js'
 import { ITEM_STATUSES, SERVICES, STATUSES, THEMES } from '../../src/lib/domain/constants.js'
-import { FILTERS } from '../../src/lib/domain/projects.js'
+import { DUE_GROUPS, FILTERS } from '../../src/lib/domain/projects.js'
 import { RANGES } from '../../src/lib/domain/reports.js'
 
 const files = readdirSync('src', { recursive: true })
@@ -40,6 +40,8 @@ test('کلیدهای ساخته‌شده در زمان اجرا', () => {
     item: ITEM_STATUSES,
     'settings.theme': THEMES,
     'projects.filter': FILTERS,
+    group: DUE_GROUPS,
+    'clients.filter': ['all', 'owed'],
     'reports.range': RANGES,
     pay: ['free', 'unpaid', 'partial', 'paid', 'none'],
     storage: ['corrupt', 'blocked', 'newer'],

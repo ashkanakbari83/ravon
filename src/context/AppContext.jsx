@@ -3,7 +3,9 @@ import { useNow } from '../hooks/useNow.js'
 import { translate } from '../i18n/index.js'
 import { applySeedRelease } from '../lib/domain/demo.js'
 import { emptyState } from '../lib/domain/state.js'
+import { setStatus } from '../lib/domain/projects.js'
 import { projectRows } from '../lib/domain/stats.js'
+import { removedBetween, restoreRemoved, restoreStatus } from '../lib/domain/undo.js'
 import * as format from '../lib/format.js'
 import { createGateway, STORAGE_KEY } from '../lib/gateway.js'
 import { newId } from '../lib/ids.js'
@@ -41,7 +43,8 @@ export function AppProvider({ children }) {
       toastId.current += 1
       const id = toastId.current
       setToasts((list) => [...list.slice(-1), { id, message, tone, action }])
-      setTimeout(() => dismissToast(id), action ? 6000 : 3200)
+      // پیامی که دکمه داره بیشتر می‌مونه تا فرصت «برگردون» باشه
+      setTimeout(() => dismissToast(id), action ? 7000 : 3200)
     },
     [dismissToast],
   )
@@ -79,6 +82,51 @@ export function AppProvider({ children }) {
     },
     [commit, toast],
   )
+
+  /** مثل run، ولی خطا رو به خود فرم می‌سپره */
+  const attempt = useCallback(
+    (fn, ...args) => {
+      const result = fn(dbRef.current, ...args)
+      if (result.ok) commit(result.db)
+      return result
+    },
+    [commit],
+  )
+
+  const undoAction = useCallback(
+    (fn, ...args) => ({ label: translate(dbRef.current.settings.locale, 'common.undo'), run: () => run(fn, ...args) }),
+    [run],
+  )
+
+  /** حذف بدون پنجره‌ی تأیید، با «برگردون» */
+  const removeWithUndo = useCallback(
+    (message, fn, ...args) => {
+      const before = dbRef.current
+      const result = run(fn, ...args)
+      if (result.ok) toast(message, { action: undoAction(restoreRemoved, removedBetween(before, result.db)) })
+      return result
+    },
+    [run, toast, undoAction],
+  )
+
+  const changeStatus = useCallback(
+    (id, status) => {
+      const before = dbRef.current.projects.find((p) => p.id === id)
+      if (!before || before.status === status) return { ok: true }
+      const result = run(setStatus, id, status, ctx())
+      if (result.ok) {
+        const { locale: lang } = dbRef.current.settings
+        toast(translate(lang, 'status.changed', { status: translate(lang, `status.${status}`) }), {
+          action: undoAction(restoreStatus, id, { status: before.status, deliveredOn: before.deliveredOn }),
+        })
+      }
+      return result
+    },
+    [run, ctx, toast, undoAction],
+  )
+
+  // پیش‌نویس فرم‌ها فقط تا وقتی برنامه بازه
+  const drafts = useRef({})
 
   const wipe = useCallback(() => {
     const next = emptyState()
@@ -140,7 +188,8 @@ export function AppProvider({ children }) {
   )
 
   const value = {
-    db, rows, today, locale, t, fmt, serviceName, run, ctx, wipe, commit,
+    db, rows, today, locale, t, fmt, serviceName, run, attempt, ctx, wipe, commit,
+    removeWithUndo, changeStatus, undoAction, drafts,
     toast, toasts, dismissToast,
     sheet, openSheet, closeSheet,
     storageError, dismissStorageError: () => setStorageError((e) => (e === 'newer' ? e : null)), rawData: gateway.raw,

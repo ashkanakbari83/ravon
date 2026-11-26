@@ -34,15 +34,29 @@ function Calendar({ value, onPick, max }) {
 }
 
 /** past=true: برای تاریخ پرداخت/زمان (امروز و عقب‌تر) */
-export default function DateField({ label, value, onChange, past = false }) {
+export default function DateField({ label, value, onChange, past = false, collapsible = false }) {
   const { t, fmt, today } = useApp()
   const [open, setOpen] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const quick = past
     ? [[today, t('common.today')]]
     : [[today, t('common.today')], [addDays(today, 1), t('pick.tomorrow')], [addDays(today, 3), t('pick.in3')], [addDays(today, 7), t('pick.in7')]]
   const pick = (v) => {
     onChange(v)
     setOpen(false)
+    setExpanded(false)
+  }
+  // جایی که تاریخ فقط خونده می‌شه، تا وقتی لازم نشده انتخاب‌گر باز نیست
+  if (collapsible && !expanded) {
+    return (
+      <div className="setting">
+        <span className="setting__label">{label}</span>
+        <button type="button" className="chip" aria-expanded="false" aria-label={`${t('common.change')} ${label}`} onClick={() => setExpanded(true)}>
+          <Icon name="calendar" size={16} />
+          {value ? fmt.date(value, { weekday: true }) : t('due.none')}
+        </button>
+      </div>
+    )
   }
   return (
     <div className="field" role="group" aria-label={label}>

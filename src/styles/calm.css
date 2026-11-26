@@ -4,6 +4,7 @@ strong { font-weight: 800; }
 ::selection { background: var(--brand-soft); }
 @media (max-width: 360px) {
   .main { padding-inline: var(--s3); }
+  .clip__client { display: none; }
   .owed__number { font-size: 2.5rem; }
   .stat__value, .headline__value { font-size: var(--fs-l); }
   .card { padding: var(--s3); }

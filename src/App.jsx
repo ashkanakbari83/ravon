@@ -1,8 +1,9 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useCallback, useEffect } from 'react'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import Layout from './components/Layout.jsx'
 import { useApp } from './context/AppContext.jsx'
-import { useRoute } from './hooks/useRoute.js'
+import { scrollTarget, useRoute } from './hooks/useRoute.js'
+import { useShortcuts } from './hooks/useShortcuts.js'
 import Sheets from './modals/Sheets.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import NotFound from './pages/NotFound.jsx'
@@ -19,19 +20,23 @@ const PAGES = {
 }
 
 export default function App() {
-  const { db, t, closeSheet, storageError } = useApp()
+  const { db, t, openSheet, closeSheet, storageError } = useApp()
   const route = useRoute()
   const Page = PAGES[route.name] || NotFound
   const pageKey = `${route.name}/${route.id || ''}`
 
-  // با عوض‌شدن صفحه: برگه بسته می‌شه و اسکرول برمی‌گرده بالا
+  // با عوض‌شدن صفحه برگه بسته می‌شه؛ صفحه‌ی تازه از بالا شروع می‌شه و «برگشت» از همون‌جای قبلی
   useEffect(() => {
     closeSheet()
-    window.scrollTo(0, 0)
+    window.scrollTo(0, scrollTarget())
   }, [pageKey])
 
   // اگه ذخیره‌ی قبلی خونده نشده، خوش‌آمد نشون نمی‌دیم تا هشدارش دیده بشه
-  if (!db.meta.onboarded && !db.projects.length && !storageError) return <Welcome />
+  const welcome = !db.meta.onboarded && !db.projects.length && !storageError
+  const quickAdd = useCallback(() => openSheet('quickAdd'), [openSheet])
+  useShortcuts({ enabled: !welcome, onNew: quickAdd })
+
+  if (welcome) return <Welcome />
   return (
     <>
       <Layout route={route}>

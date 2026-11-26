@@ -29,10 +29,11 @@ function Nav({ route }) {
             <span>{t(tab.label)}</span>
           </a>
         ) : (
-          <button key="new" type="button" className="nav__new" onClick={() => openSheet('quickAdd')}>
+          <button key="new" type="button" className="nav__new" aria-keyshortcuts="N" onClick={() => openSheet('quickAdd')}>
             <span className="nav__plus"><Icon name="plus" size={24} /></span>
             <span className="nav__newShort">{t('nav.newShort')}</span>
             <span className="nav__newLong">{t('nav.new')}</span>
+            <kbd className="kbd" aria-hidden="true">N</kbd>
           </button>
         ),
       )}

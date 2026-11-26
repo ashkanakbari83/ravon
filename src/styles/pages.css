@@ -66,6 +66,8 @@
 .person__money small { font-size: var(--fs-xs); color: var(--ink-2); }
 .person__money--owed strong, .person__money--owed small { color: var(--wait); }
 
+.clients-filter { margin-bottom: var(--s3); }
+
 /* ---------- جزئیات ---------- */
 .detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s2); margin-bottom: var(--s3); }
 .detail-head > div { min-width: 0; }
@@ -148,7 +150,7 @@
   .toasts { bottom: var(--s5); inset-inline-start: calc(var(--side-w) + var(--s4)); }
   .shell--timer .toasts { bottom: 100px; }
   .timerbar { inset-inline: auto var(--s5); bottom: var(--s5); width: 420px; }
-  .dash { grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); grid-template-rows: auto auto auto auto 1fr; grid-template-areas: 'owed timeline' 'counts timeline' 'month timeline' 'awaiting timeline' '. timeline'; align-items: start; }
+  .dash { grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); grid-template-rows: auto auto auto auto 1fr; grid-template-areas: 'owed timeline' 'counts timeline' 'awaiting timeline' 'month timeline' '. timeline'; align-items: start; }
   .owed { grid-area: owed; }
   .counts { grid-area: counts; }
   .month { grid-area: month; }
@@ -158,5 +160,13 @@
   .columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .clip { grid-template-columns: 170px 84px minmax(0, 1fr); grid-template-areas: 'title due track' 'client due track'; align-items: center; column-gap: var(--s3); }
   .clip__title { max-width: none; }
-  .timeline__ruler { margin-inline-start: calc(170px + 84px + 2 * var(--s3)); }
+  .timeline__ruler { margin-inline-start: calc(var(--tap) + var(--s1) + 170px + 84px + 2 * var(--s3)); }
+  .stepbar .btn { flex: 0 1 280px; }
+}
+
+/* راهنمای میانبرها فقط جایی که کیبورد و موس هست */
+@media (min-width: 900px) and (hover: hover) {
+  .nav .kbd { display: inline-block; }
+  .search .kbd { display: inline-block; flex: none; }
+  .search:focus-within .kbd { display: none; }
 }

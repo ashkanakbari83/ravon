@@ -41,7 +41,7 @@ export async function quickAdd(page, { title, client, service = 'ریلز', amou
   // خدمت‌های کم‌استفاده پشت «بیشتر»ان
   if (!(await chip.count())) await dialog.getByRole('button', { name: 'بیشتر', exact: true }).click()
   await chip.click()
-  await dialog.getByLabel('مبلغ').fill(amount)
+  await dialog.getByLabel('مبلغ', { exact: true }).fill(amount)
   await dialog.getByRole('button', { name: 'ثبت پروژه' }).click()
   await expect(dialog).toHaveCount(0)
 }

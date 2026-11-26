@@ -1,5 +1,5 @@
 import { useApp } from '../context/AppContext.jsx'
-import { href } from '../hooks/useRoute.js'
+import { cameFrom, href } from '../hooks/useRoute.js'
 import { dueInfo } from '../lib/domain/projects.js'
 import Icon from './Icon.jsx'
 
@@ -62,13 +62,16 @@ export function StatusButton({ project }) {
   const label = t(`status.${project.status}`)
   return (
     <button type="button" className={`status status--${project.status}`} onClick={() => openSheet('status', { projectId: project.id })} aria-label={t('status.of', { title: project.title, status: label })}>
-      <span className="status__pill">{label}</span>
+      <span className="status__pill">
+        {label}
+        <Icon name="chevron" size={14} />
+      </span>
     </button>
   )
 }
 
-export function ProjectRow({ row, showClient = true }) {
-  const { t, fmt, serviceName } = useApp()
+export function ProjectRow({ row, showClient = true, quickPay = false }) {
+  const { t, fmt, serviceName, openSheet } = useApp()
   const { project, client, paid, balance, payState } = row
   return (
     <li className="row">
@@ -87,7 +90,13 @@ export function ProjectRow({ row, showClient = true }) {
       <div className="row__foot">
         <StatusButton project={project} />
         <DueTag project={project} />
-        {balance > 0 && paid > 0 && <MoneyBar paid={paid} total={project.amount} thin />}
+        {balance > 0 && (quickPay || project.status === 'delivered') ? (
+          <button type="button" className="row__action" aria-label={`${t('pay.add')}: ${project.title}`} onClick={() => openSheet('payment', { projectId: project.id })}>
+            <span><Icon name="wallet" size={14} />{t('pay.addShort')}</span>
+          </button>
+        ) : (
+          balance > 0 && paid > 0 && <MoneyBar paid={paid} total={project.amount} thin />
+        )}
       </div>
     </li>
   )
@@ -109,8 +118,14 @@ export function Stat({ label, value, to, tone }) {
 }
 
 export function BackLink({ to, children }) {
+  // اگه از همون صفحه اومده، برگشت واقعی تا فیلتر و جای فهرست بمونه
+  const back = (event) => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || !cameFrom(to)) return
+    event.preventDefault()
+    window.history.back()
+  }
   return (
-    <a className="back" href={href(to)}>
+    <a className="back" href={href(to)} onClick={back}>
       <Icon name="back" size={18} />
       {children}
     </a>

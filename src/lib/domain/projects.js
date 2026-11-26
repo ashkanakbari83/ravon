@@ -13,8 +13,11 @@ export const paidFor = (db, projectId) =>
  * ثبت سریع: عنوان، کارفرما (id یا اسم جدید)، نوع خدمت و مبلغ. بقیه اختیاری.
  */
 export function addProject(db, input, ctx) {
+  // ترتیب بررسی همون ترتیب فیلدهای فرمه تا فوکوس روی اولین خطا بره
   const title = clean(input.title, 120)
   if (!title) return fail('err.title')
+  const name = clean(input.clientName, 80)
+  if (input.clientId ? !db.clients.some((c) => c.id === input.clientId) : !name) return fail('err.client')
   const service = clean(input.service, 40)
   if (!service) return fail('err.service')
   if (!validAmount(input.amount)) return fail('err.amount')
@@ -22,11 +25,7 @@ export function addProject(db, input, ctx) {
 
   let next = db
   let clientId = input.clientId
-  if (clientId) {
-    if (!db.clients.some((c) => c.id === clientId)) return fail('err.client')
-  } else {
-    const name = clean(input.clientName, 80)
-    if (!name) return fail('err.client')
+  if (!clientId) {
     const existing = findClientByName(db, name)
     if (existing) clientId = existing.id
     else {
@@ -213,4 +212,24 @@ export function sortRows(rows) {
     }
     return pb.createdAt.localeCompare(pa.createdAt)
   })
+}
+
+/** محتمل‌ترین کار بعدی، تا با یک لمس انجام بشه */
+export function nextStep(project) {
+  if (project.status === 'queued') return { status: 'active', label: 'step.start' }
+  if (project.status === 'active' || project.status === 'review') return { status: 'delivered', label: 'step.deliver' }
+  if (project.status === 'cancelled') return { status: 'active', label: 'step.reopen' }
+  return null
+}
+
+export const DUE_GROUPS = ['overdue', 'week', 'later', 'none']
+
+/** ردیف‌های باز (از قبل مرتب‌شده) به ترتیب فوریت گروه می‌شن */
+export function groupByDue(rows, today) {
+  const keyOf = ({ project }) => {
+    const { state } = dueInfo(project, today)
+    if (state === 'overdue' || state === 'none' || state === 'later') return state
+    return 'week'
+  }
+  return DUE_GROUPS.map((key) => ({ key, rows: rows.filter((r) => keyOf(r) === key) })).filter((g) => g.rows.length)
 }

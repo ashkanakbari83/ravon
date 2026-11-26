@@ -77,6 +77,16 @@ for (const [name, options] of Object.entries(VIEWS)) {
     await page.locator('.row__link').first().click()
     await page.getByRole('button', { name: 'شروع تایمر' }).click()
     await shot('11-timer', false)
+    await page.locator('.timerbar').getByRole('button').click()
+    await go('clients?filter=owed')
+    await shot('12-clients-owed', false)
+    await go('')
+    await page.locator('.clip__done').first().click()
+    await shot('13-undo', false)
+    await page.locator('.nav__new').click()
+    await page.getByLabel('عنوان').fill('تیزر تازه')
+    await page.getByRole('button', { name: 'ثبت پروژه' }).click()
+    await shot('14-error', false)
     await context.close()
   }
 }

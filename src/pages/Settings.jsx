@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import Icon from '../components/Icon.jsx'
 import { Chips } from '../components/ui.jsx'
 import { useApp } from '../context/AppContext.jsx'
+import { useInstall } from '../hooks/useInstall.js'
 import { markBackup, parseBackup, serializeBackup } from '../lib/domain/backup.js'
 import { THEMES } from '../lib/domain/constants.js'
 import { loadDemo, removeDemo } from '../lib/domain/demo.js'
@@ -11,6 +12,7 @@ import { downloadFile } from '../lib/download.js'
 export default function Settings() {
   const { db, t, fmt, locale, run, ctx, wipe, commit, toast, openSheet } = useApp()
   const file = useRef(null)
+  const app = useInstall()
   const setting = (key, value) => commit({ ...db, settings: { ...db.settings, [key]: value } })
 
   const backup = () => {
@@ -45,6 +47,17 @@ export default function Settings() {
           <Chips label={t('settings.currency')} value={db.settings.currency} onChange={(v) => setting('currency', v)} options={Object.entries(CURRENCIES).map(([v, c]) => ({ value: v, label: c[locale] }))} />
           <p className="muted">{t('settings.currencyHint')}</p>
         </section>
+        {app.mode && (
+          <section className="card">
+            <h2>{t('settings.install')}</h2>
+            <p className="muted">{t('settings.installHint')}</p>
+            {app.mode === 'prompt' ? (
+              <button type="button" className="btn btn--primary btn--block" onClick={app.install}><Icon name="download" />{t('settings.installDo')}</button>
+            ) : (
+              <p><strong>{t('settings.installIos')}</strong></p>
+            )}
+          </section>
+        )}
         <section className="card">
           <h2>{t('settings.backup')}</h2>
           <p className="muted">{t('settings.backupHint')}</p>
