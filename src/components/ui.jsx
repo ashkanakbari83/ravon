@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useApp } from '../context/AppContext.jsx'
 import { cameFrom, href } from '../hooks/useRoute.js'
 import { dueInfo } from '../lib/domain/projects.js'
@@ -18,8 +19,20 @@ export function EmptyState({ title, text, children }) {
 }
 
 export function Chips({ label, options, value, onChange, scroll = false }) {
+  const box = useRef(null)
+  // فقط خود ردیف جابه‌جا می‌شه، نه صفحه
+  useEffect(() => {
+    const row = box.current
+    const chosen = scroll && row.querySelector('[aria-pressed="true"]')
+    if (!chosen) return
+    const a = chosen.getBoundingClientRect()
+    const b = row.getBoundingClientRect()
+    const edge = 32
+    if (a.left < b.left + edge) row.scrollBy({ left: a.left - b.left - edge })
+    else if (a.right > b.right - edge) row.scrollBy({ left: a.right - b.right + edge })
+  }, [value, scroll])
   return (
-    <div className={scroll ? 'chips chips--scroll' : 'chips'} role="group" aria-label={label}>
+    <div ref={box} className={scroll ? 'chips chips--scroll' : 'chips'} role="group" aria-label={label}>
       {options.map((o) => (
         <button key={o.value} type="button" className="chip" aria-pressed={value === o.value} onClick={() => onChange(o.value)}>
           {o.label}
@@ -30,11 +43,11 @@ export function Chips({ label, options, value, onChange, scroll = false }) {
 }
 
 /** نوار تسویه: سبز = دریافتی، هاشور = مانده */
-export function MoneyBar({ paid, total, thin = false }) {
+export function MoneyBar({ paid, total }) {
   const { t, fmt } = useApp()
   const ratio = total > 0 ? Math.min(1, paid / total) : 0
   return (
-    <div className={thin ? 'moneybar moneybar--thin' : 'moneybar'} role="img" aria-label={t('money.barLabel', { received: fmt.short(paid), agreed: fmt.short(total) })}>
+    <div className="moneybar" role="img" aria-label={t('money.barLabel', { received: fmt.short(paid), agreed: fmt.short(total) })}>
       {ratio > 0 && <span className="moneybar__paid" style={{ flexGrow: ratio }} />}
       {ratio < 1 && <span className="moneybar__rest" style={{ flexGrow: 1 - ratio }} />}
     </div>
@@ -72,7 +85,7 @@ export function StatusButton({ project }) {
 
 export function ProjectRow({ row, showClient = true, quickPay = false }) {
   const { t, fmt, serviceName, openSheet } = useApp()
-  const { project, client, paid, balance, payState } = row
+  const { project, client, balance, payState } = row
   return (
     <li className="row">
       <a className="row__link" href={href(`project/${project.id}`)}>
@@ -90,12 +103,10 @@ export function ProjectRow({ row, showClient = true, quickPay = false }) {
       <div className="row__foot">
         <StatusButton project={project} />
         <DueTag project={project} />
-        {balance > 0 && (quickPay || project.status === 'delivered') ? (
+        {balance > 0 && (quickPay || project.status === 'delivered') && (
           <button type="button" className="row__action" aria-label={`${t('pay.add')}: ${project.title}`} onClick={() => openSheet('payment', { projectId: project.id })}>
             <span><Icon name="wallet" size={14} />{t('pay.addShort')}</span>
           </button>
-        ) : (
-          balance > 0 && paid > 0 && <MoneyBar paid={paid} total={project.amount} thin />
         )}
       </div>
     </li>

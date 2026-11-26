@@ -1,0 +1,18 @@
+export default {
+  'news.title': ['چی تازه شده؟', 'What’s new'],
+  'news.ok': ['فهمیدم', 'Got it'],
+  'news.older': ['تغییرات قبلی', 'Earlier changes'],
+  'news.version': ['نسخه‌ی {version}', 'Version {version}'],
+  'news.open': ['تازه‌های رَوون', 'What’s new in RAVON'],
+  'news.updateReady': ['نسخه‌ی تازه آماده‌ست', 'A new version is ready'],
+  'news.update': ['به‌روزرسانی', 'Update'],
+  'news.v3.due': ['«مهلت تحویل» واضح‌تر شد: برای هر کار نوشته چند روز دیر شده یا مونده.', 'Deadlines now say how many days each job is late or has left.'],
+  'news.v3.colors': ['رنگ‌بندی تازه؛ رنگ برنامه رو هم می‌تونی از تنظیمات عوض کنی.', 'New colors, and you can pick an accent in Settings.'],
+  'news.v3.mobile': ['گوشی راحت‌تر شد: کیبورد فرم‌ها رو نمی‌پوشونه، برگه‌ها با کشیدن بسته می‌شن و متن‌ها خواناترن.', 'Better on phones: forms stay above the keyboard, sheets swipe closed, text is easier to read.'],
+  'news.v3.news': ['بعد از هر به‌روزرسانی، همین‌جا خبر تغییرات رو می‌بینی.', 'After every update you’ll see the changes here.'],
+  'news.v2.undo': ['حذف و تغییر وضعیت «برگردون» دارن.', 'Deletes and status changes can be undone.'],
+  'news.v2.quick': ['ثبت پروژه: مبلغ پیشنهادی، بیعانه و نگه‌داشتن پیش‌نویس.', 'Adding a project: suggested amounts, deposit and drafts.'],
+  'news.v2.lists': ['«تحویل شد» و «دریافت» با یک لمس؛ پروژه‌های باز بر اساس فوریت گروه‌بندی شدن.', 'One-tap deliver and payment; open projects grouped by urgency.'],
+  'news.v2.back': ['برگشت، فیلتر و جای فهرست رو نگه می‌داره.', 'Back keeps your filter and scroll position.'],
+  'news.v1.first': ['اولین نسخه: پروژه، کارفرما، دریافتی، زمان و گزارش.', 'First release: projects, clients, payments, time and reports.'],
+}

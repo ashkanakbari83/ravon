@@ -1,11 +1,11 @@
 import { isIsoDate } from '../jalali.js'
-import { ITEM_STATUSES, MAX_AMOUNT, STATE_VERSION, STATUSES, THEMES } from './constants.js'
+import { ACCENTS, ITEM_STATUSES, MAX_AMOUNT, STATE_VERSION, STATUSES, THEMES } from './constants.js'
 
 export function emptyState() {
   return {
     version: STATE_VERSION,
-    meta: { onboarded: false, demo: null, demoAnchor: null, seedRelease: 0, lastBackupAt: null, backupSnoozedAt: null },
-    settings: { currency: 'toman', theme: 'system', locale: 'fa' },
+    meta: { onboarded: false, demo: null, demoAnchor: null, seedRelease: 0, lastBackupAt: null, backupSnoozedAt: null, seenRelease: 0 },
+    settings: { currency: 'toman', theme: 'system', accent: 'indigo', locale: 'fa' },
     clients: [],
     projects: [],
     payments: [],
@@ -29,6 +29,7 @@ export function withDefaults(raw) {
   const meta = { ...base.meta, ...(raw.meta || {}) }
   const settings = { ...base.settings, ...(raw.settings || {}) }
   if (!THEMES.includes(settings.theme)) settings.theme = 'system'
+  if (!ACCENTS.includes(settings.accent)) settings.accent = 'indigo'
   if (!['toman', 'rial', 'usd'].includes(settings.currency)) settings.currency = 'toman'
   if (!['fa', 'en'].includes(settings.locale)) settings.locale = 'fa'
 

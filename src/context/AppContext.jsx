@@ -1,9 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useNow } from '../hooks/useNow.js'
+import { LATEST_RELEASE } from '../data/releases.js'
 import { translate } from '../i18n/index.js'
 import { applySeedRelease } from '../lib/domain/demo.js'
 import { emptyState } from '../lib/domain/state.js'
 import { setStatus } from '../lib/domain/projects.js'
+import { markReleasesSeen } from '../lib/domain/releases.js'
 import { projectRows } from '../lib/domain/stats.js'
 import { removedBetween, restoreRemoved, restoreStatus } from '../lib/domain/undo.js'
 import * as format from '../lib/format.js'
@@ -23,7 +25,10 @@ const gateway = createGateway(browserStorage)
 export function AppProvider({ children }) {
   const [initial] = useState(() => {
     const loaded = gateway.load()
-    return { ...loaded, db: applySeedRelease(loaded.db) }
+    const db = applySeedRelease(loaded.db)
+    // کاربر تازه «تغییرات» نمی‌خواد؛ همه‌چیز براش تازه‌ست
+    const newcomer = !db.meta.onboarded && !db.projects.length
+    return { ...loaded, db: newcomer ? markReleasesSeen(db, LATEST_RELEASE).db : db }
   })
   const [db, setDb] = useState(initial.db)
   const [storageError, setStorageError] = useState(initial.error)
@@ -33,7 +38,7 @@ export function AppProvider({ children }) {
   const toastId = useRef(0)
   const now = useNow()
   const today = toIsoDate(now)
-  const { locale, currency, theme } = db.settings
+  const { locale, currency, theme, accent } = db.settings
 
   const t = useCallback((key, vars) => translate(locale, key, vars), [locale])
 
@@ -132,6 +137,7 @@ export function AppProvider({ children }) {
     const next = emptyState()
     next.settings = dbRef.current.settings
     next.meta.onboarded = true
+    next.meta.seenRelease = dbRef.current.meta.seenRelease
     commit(next)
   }, [commit])
 
@@ -156,10 +162,20 @@ export function AppProvider({ children }) {
     const root = document.documentElement
     if (theme === 'system') delete root.dataset.theme
     else root.dataset.theme = theme
+    root.dataset.accent = accent
     root.lang = locale
     root.dir = locale === 'fa' ? 'rtl' : 'ltr'
     document.title = translate(locale, 'app.name')
-  }, [theme, locale])
+    // رنگ نوار بالای گوشی با پوسته‌ی انتخابی یکی می‌مونه
+    const paintBar = () => {
+      const color = getComputedStyle(root).getPropertyValue('--bg').trim()
+      document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', color))
+    }
+    paintBar()
+    const scheme = window.matchMedia('(prefers-color-scheme: dark)')
+    scheme.addEventListener('change', paintBar)
+    return () => scheme.removeEventListener('change', paintBar)
+  }, [theme, accent, locale])
 
   const fmt = useMemo(
     () => ({

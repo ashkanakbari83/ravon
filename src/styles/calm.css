@@ -3,12 +3,15 @@ h1, h2 { text-wrap: balance; }
 strong { font-weight: 800; }
 ::selection { background: var(--brand-soft); }
 @media (max-width: 360px) {
-  .main { padding-inline: var(--s3); }
-  .clip__client { display: none; }
+  .main { --gutter: var(--s3); padding-inline: var(--gutter); }
+  .duelist__link { grid-template-columns: 54px minmax(0, 1fr); column-gap: var(--s2); }
+  .duelist__date { display: none; }
   .owed__number { font-size: 2.5rem; }
   .stat__value, .headline__value { font-size: var(--fs-l); }
   .card { padding: var(--s3); }
   .row__link, .row__foot { padding-inline: var(--s3); }
+  .row__foot { gap: var(--s2); }
+  .row__foot .status__pill, .row__action span { padding-inline: var(--s2); }
   .trio dd { font-size: var(--fs-s); }
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .metrics .stat:nth-child(3) { border-inline-start: 0; }
