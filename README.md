@@ -53,6 +53,7 @@ src/styles       tokens → base → components → pages → calm
 ## مستندات
 
 - [قوانین پول، زمان و گزارش](docs/rules.md)
+- [تازه‌های هر نسخه (قبل از انتشار بخون)](docs/releases.md)
 - [ذخیره، پشتیبان و حریم داده](docs/storage.md)
 - [داده‌ی نمونه](docs/demo-data.md)
 - [وقتی سرور اضافه شد](docs/server.md)
