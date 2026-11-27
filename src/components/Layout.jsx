@@ -1,5 +1,6 @@
 import { useApp } from '../context/AppContext.jsx'
 import { useAppUpdate } from '../hooks/useAppUpdate.js'
+import { useDarkMode } from '../hooks/useDarkMode.js'
 import { href } from '../hooks/useRoute.js'
 import { useNow } from '../hooks/useNow.js'
 import { useStopTimer } from '../hooks/useStopTimer.js'
@@ -17,6 +18,7 @@ const TABS = [
 
 function Nav({ route }) {
   const { t, openSheet } = useApp()
+  const theme = useDarkMode()
   return (
     <nav className="nav" aria-label={t('nav.main')}>
       <a className="nav__brand" href={href('')}>
@@ -38,6 +40,10 @@ function Nav({ route }) {
           </button>
         ),
       )}
+      <button type="button" className="nav__theme" onClick={theme.toggle}>
+        <Icon name={theme.icon} size={22} />
+        <span>{t(theme.label)}</span>
+      </button>
       <a className="nav__settings" href={href('settings')} aria-current={route.name === 'settings' ? 'page' : undefined}>
         <Icon name="settings" size={22} />
         <span>{t('nav.settings')}</span>
@@ -109,6 +115,7 @@ function StorageBanner() {
 
 export default function Layout({ route, children }) {
   const { db, t } = useApp()
+  const theme = useDarkMode()
   return (
     <div className={db.timer ? 'shell shell--timer' : 'shell'}>
       <button type="button" className="skip" onClick={() => document.getElementById('main').focus()}>{t('nav.skip')}</button>
@@ -117,9 +124,14 @@ export default function Layout({ route, children }) {
           <Logo size={30} />
           <span>{t('app.name')}</span>
         </a>
-        <a className="iconbtn" href={href('settings')} aria-label={t('nav.settings')} aria-current={route.name === 'settings' ? 'page' : undefined}>
-          <Icon name="settings" />
-        </a>
+        <div className="topbar__actions">
+          <button type="button" className="iconbtn" aria-label={t(theme.label)} onClick={theme.toggle}>
+            <Icon name={theme.icon} />
+          </button>
+          <a className="iconbtn" href={href('settings')} aria-label={t('nav.settings')} aria-current={route.name === 'settings' ? 'page' : undefined}>
+            <Icon name="settings" />
+          </a>
+        </div>
       </header>
       <Nav route={route} />
       <main id="main" className="main" tabIndex={-1}>

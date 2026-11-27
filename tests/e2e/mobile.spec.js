@@ -23,16 +23,16 @@ test('کاربر تازه پنجره‌ی تغییرات نمی‌بینه', asy
 
 test('بعد از به‌روزرسانی یک بار میاد و بعد از بستن دیگه نه', async ({ page }) => {
   await asReturningUser(page)
-  await expect(news(page)).toContainText('مهلت تحویل')
+  await expect(news(page)).toContainText('روشن/تیره')
   await expect(news(page).locator('.news')).toHaveCount(1)
   // تا نبسته، دیده‌شده نیست
   await page.reload()
   await expect(news(page)).toBeVisible()
   await news(page).getByRole('button', { name: 'تغییرات قبلی' }).click()
-  await expect(news(page).locator('.news')).toHaveCount(3)
+  await expect(news(page).locator('.news')).toHaveCount(4)
   await news(page).getByRole('button', { name: 'فهمیدم' }).click()
   await expect(sheet(page)).toHaveCount(0)
-  expect((await state(page)).meta.seenRelease).toBe(3)
+  expect((await state(page)).meta.seenRelease).toBe(4)
   await page.reload()
   await expect(page.getByRole('heading', { name: 'مهلت تحویل' })).toBeVisible()
   await expect(sheet(page)).toHaveCount(0)
@@ -45,7 +45,7 @@ test('Esc هم یعنی دیدم؛ و از تنظیمات همیشه در دست
   await expect(sheet(page)).toHaveCount(0)
   await go(page, 'settings')
   await page.getByRole('button', { name: 'تازه‌های رَوون' }).click()
-  await expect(news(page).locator('.news')).toHaveCount(3)
+  await expect(news(page).locator('.news')).toHaveCount(4)
 })
 
 test('مهلت تحویل: دیر و مونده با عدد و کلمه', async ({ page }) => {
@@ -64,7 +64,7 @@ test('رنگ برنامه عوض می‌شه، می‌مونه و رنگ نوا�
   const before = await brand()
   await page.getByRole('button', { name: 'فیروزه‌ای' }).click()
   expect(await brand()).not.toBe(before)
-  await page.getByRole('button', { name: 'تیره' }).click()
+  await page.getByRole('button', { name: 'تیره', exact: true }).click()
   await expect(page.locator('meta[name="theme-color"]').first()).toHaveAttribute('content', '#0e1017')
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('data-accent', 'teal')
