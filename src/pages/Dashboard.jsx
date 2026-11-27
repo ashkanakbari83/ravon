@@ -1,31 +1,27 @@
 import { useMemo } from 'react'
 import DueList from '../components/DueList.jsx'
+import FollowUpNote from '../components/FollowUpNote.jsx'
 import Icon from '../components/Icon.jsx'
 import { EmptyState, MoneyBar, Stat } from '../components/ui.jsx'
 import { useApp } from '../context/AppContext.jsx'
+import { useBackup } from '../hooks/useBackup.js'
 import { href } from '../hooks/useRoute.js'
-import { markBackup, needsBackup, serializeBackup, snoozeBackup } from '../lib/domain/backup.js'
+import { needsBackup, snoozeBackup } from '../lib/domain/backup.js'
 import { removeDemo } from '../lib/domain/demo.js'
 import { dashboardStats } from '../lib/domain/stats.js'
-import { downloadFile } from '../lib/download.js'
 import { MONTHS } from '../lib/format.js'
 import { isoToJalali } from '../lib/jalali.js'
 
 const DUE_ROWS = 5
 
 function BackupReminder() {
-  const { db, t, today, run, ctx, toast } = useApp()
+  const { db, t, today, run, ctx } = useApp()
+  const backup = useBackup()
   if (!needsBackup(db, today)) return null
-  const download = () => {
-    const context = ctx()
-    downloadFile(`ravon-backup-${context.today}.json`, serializeBackup(db, context), 'application/json')
-    run(markBackup, context)
-    toast(t('settings.backupDone'))
-  }
   return (
     <div className="banner">
       <span>{t('backup.remind')}</span>
-      <button type="button" className="link" onClick={download}>{t('backup.now')}</button>
+      <button type="button" className="link" onClick={backup.canShare ? backup.share : backup.download}>{t(backup.canShare ? 'backup.send' : 'backup.now')}</button>
       <button type="button" className="link link--quiet" onClick={() => run(snoozeBackup, ctx())}>{t('backup.later')}</button>
     </div>
   )
@@ -97,6 +93,7 @@ export default function Dashboard() {
                   <a href={href(`project/${project.id}`)} className="line__main">
                     <span className="line__title">{client?.name}</span>
                     <span className="line__sub">{project.title}</span>
+                    <FollowUpNote project={project} className="line__follow" short />
                   </a>
                   <strong className="line__value">{fmt.compact(balance)}</strong>
                   <button type="button" className="btn btn--small" onClick={() => openSheet('payment', { projectId: project.id })}>{t('pay.addShort')}</button>

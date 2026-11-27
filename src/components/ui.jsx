@@ -34,7 +34,7 @@ export function Chips({ label, options, value, onChange, scroll = false }) {
   return (
     <div ref={box} className={scroll ? 'chips chips--scroll' : 'chips'} role="group" aria-label={label}>
       {options.map((o) => (
-        <button key={o.value} type="button" className="chip" aria-pressed={value === o.value} onClick={() => onChange(o.value)}>
+        <button key={String(o.value)} type="button" className="chip" aria-pressed={value === o.value} onClick={() => onChange(o.value)}>
           {o.label}
         </button>
       ))}

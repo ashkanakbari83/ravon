@@ -8,4 +8,7 @@ export const ACCENTS = ['indigo', 'teal', 'plum', 'graphite']
 export const MAX_AMOUNT = 999_999_999_999
 export const MAX_ENTRY_MINUTES = 24 * 60
 export const SOON_DAYS = 7
+export const MAX_REVISION_LIMIT = 99
+// انتخاب‌های سریعِ «اصلاح رایگان»
+export const REVISION_LIMITS = [1, 2, 3, 5]
 export const BACKUP_REMINDER_DAYS = 14

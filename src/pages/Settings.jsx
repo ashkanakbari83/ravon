@@ -3,13 +3,14 @@ import Icon from '../components/Icon.jsx'
 import { Chips } from '../components/ui.jsx'
 import { useApp } from '../context/AppContext.jsx'
 import { RELEASES } from '../data/releases.js'
+import { useBackup } from '../hooks/useBackup.js'
 import { useInstall } from '../hooks/useInstall.js'
-import { markBackup, parseBackup, serializeBackup } from '../lib/domain/backup.js'
+import { usePersistentStorage } from '../hooks/usePersistentStorage.js'
+import { parseBackup } from '../lib/domain/backup.js'
 import { ACCENTS, THEMES } from '../lib/domain/constants.js'
 import { loadDemo, removeDemo } from '../lib/domain/demo.js'
 import { markReleasesSeen } from '../lib/domain/releases.js'
 import { CURRENCIES } from '../lib/format.js'
-import { downloadFile } from '../lib/download.js'
 
 export default function Settings() {
   const { db, t, fmt, locale, run, ctx, wipe, commit, toast, openSheet } = useApp()
@@ -17,12 +18,8 @@ export default function Settings() {
   const app = useInstall()
   const setting = (key, value) => commit({ ...db, settings: { ...db.settings, [key]: value } })
 
-  const backup = () => {
-    const context = ctx()
-    downloadFile(`ravon-backup-${context.today}.json`, serializeBackup(db, context), 'application/json')
-    run(markBackup, context)
-    toast(t('settings.backupDone'))
-  }
+  const backup = useBackup()
+  const persisted = usePersistentStorage(db.projects.some((p) => !p.demo))
   const restore = async (event) => {
     const selected = event.target.files?.[0]
     event.target.value = ''
@@ -75,9 +72,16 @@ export default function Settings() {
           <h2>{t('settings.backup')}</h2>
           <p className="muted">{t('settings.backupHint')}</p>
           <p><strong>{db.meta.lastBackupAt ? t('settings.backupLast', { date: fmt.date(db.meta.lastBackupAt) }) : t('settings.backupNever')}</strong></p>
-          <button type="button" className="btn btn--primary btn--block" onClick={backup}><Icon name="download" />{t('settings.backupDownload')}</button>
+          {backup.canShare && (
+            <>
+              <button type="button" className="btn btn--primary btn--block" onClick={backup.share}><Icon name="send" />{t('backup.share')}</button>
+              <p className="muted">{t('backup.shareHint')}</p>
+            </>
+          )}
+          <button type="button" className={backup.canShare ? 'btn btn--block' : 'btn btn--primary btn--block'} onClick={backup.download}><Icon name="download" />{t('settings.backupDownload')}</button>
           <button type="button" className="btn btn--block" onClick={() => file.current.click()}><Icon name="upload" />{t('settings.restore')}</button>
-          <input ref={file} type="file" accept="application/json,.json" hidden onChange={restore} data-testid="restore-input" />
+          <input ref={file} type="file" accept="application/json,.json,text/plain,.txt" hidden onChange={restore} data-testid="restore-input" />
+          {persisted !== null && <p className="muted">{t(persisted ? 'safety.on' : 'safety.off')}</p>}
         </section>
         <section className="card">
           <h2>{t('settings.demo')}</h2>
