@@ -1,6 +1,6 @@
 import { diffDays, isIsoDate } from '../jalali.js'
 import { addClient, findClientByName, normalizeText } from './clients.js'
-import { ITEM_STATUSES, MAX_AMOUNT, OPEN_STATUSES, SOON_DAYS, STATUSES } from './constants.js'
+import { ITEM_STATUSES, MAX_AMOUNT, MAX_REVISION_LIMIT, OPEN_STATUSES, SOON_DAYS, STATUSES } from './constants.js'
 import { clean, cleanNote, fail, ok, replaceById } from './result.js'
 
 export const isOpen = (p) => OPEN_STATUSES.includes(p.status)
@@ -47,6 +47,8 @@ export function addProject(db, input, ctx) {
     dueDate: input.dueDate || null,
     note: cleanNote(input.note),
     revisions: 0,
+    revisionLimit: null,
+    followedUpOn: null,
     items: [],
     archived: false,
     createdAt: ctx.now,
@@ -108,6 +110,24 @@ export const setArchived = (db, id, archived) => withProject(db, id, (p) => ({ .
 export const changeRevisions = (db, id, delta) =>
   withProject(db, id, (p) => ({ ...p, revisions: Math.min(999, Math.max(0, p.revisions + delta)) }))
 
+/** null یعنی سقفی توافق نشده */
+export function setRevisionLimit(db, id, limit) {
+  if (limit !== null && !(Number.isInteger(limit) && limit >= 0 && limit <= MAX_REVISION_LIMIT)) return fail('err.notFound')
+  return withProject(db, id, (p) => ({ ...p, revisionLimit: limit }))
+}
+
+export const extraRevisions = (project) =>
+  project.revisionLimit == null ? 0 : Math.max(0, project.revisions - project.revisionLimit)
+
+/** هزینه‌ی کارِ اضافه روی مبلغ پروژه می‌ره، پس طلب و گزارش‌ها خودشون درست می‌شن */
+export function addCharge(db, id, extra) {
+  return withProject(db, id, (p) => {
+    if (!Number.isInteger(extra) || extra <= 0 || !validAmount(p.amount + extra)) return { error: 'err.charge' }
+    if (p.status === 'cancelled') return { error: 'err.status' }
+    return { ...p, amount: p.amount + extra }
+  })
+}
+
 export function addItem(db, projectId, title, ctx) {
   const name = clean(title, 120)
   if (!name) return fail('err.itemTitle')
@@ -141,6 +161,7 @@ export function duplicateProject(db, id, ctx, title) {
     status: 'active',
     dueDate: null,
     revisions: 0,
+    followedUpOn: null,
     items: source.items.map((i) => ({ id: ctx.newId('i'), title: i.title, status: 'todo' })),
     archived: false,
     createdAt: ctx.now,

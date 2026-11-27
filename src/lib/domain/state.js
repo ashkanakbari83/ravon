@@ -1,5 +1,5 @@
 import { isIsoDate } from '../jalali.js'
-import { ACCENTS, ITEM_STATUSES, MAX_AMOUNT, STATE_VERSION, STATUSES, THEMES } from './constants.js'
+import { ACCENTS, ITEM_STATUSES, MAX_AMOUNT, MAX_REVISION_LIMIT, STATE_VERSION, STATUSES, THEMES } from './constants.js'
 
 export function emptyState() {
   return {
@@ -59,6 +59,8 @@ export function withDefaults(raw) {
         dueDate: dateOr(p.dueDate),
         note: str(p.note),
         revisions: int(p.revisions, 0, 999),
+        revisionLimit: Number.isInteger(p.revisionLimit) ? int(p.revisionLimit, 0, MAX_REVISION_LIMIT) : null,
+        followedUpOn: dateOr(p.followedUpOn),
         items: unique(list(p.items)).map((i) => ({
           id: i.id,
           title: str(i.title) || '—',
