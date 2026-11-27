@@ -1,6 +1,8 @@
 import { useApp } from '../context/AppContext.jsx'
+import ChargeSheet from './ChargeSheet.jsx'
 import ClientSheet from './ClientSheet.jsx'
 import ConfirmSheet from './ConfirmSheet.jsx'
+import FollowUp from './FollowUp.jsx'
 import PaymentSheet from './PaymentSheet.jsx'
 import ProjectEdit from './ProjectEdit.jsx'
 import QuickAdd from './QuickAdd.jsx'
@@ -18,6 +20,8 @@ const SHEETS = {
   client: ClientSheet,
   confirm: ConfirmSheet,
   whatsNew: WhatsNew,
+  followUp: FollowUp,
+  charge: ChargeSheet,
 }
 
 export default function Sheets() {

@@ -2,6 +2,8 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const shortcut = (name, url) => ({ name, url, icons: [{ src: 'icon-192.png', sizes: '192x192', type: 'image/png' }] })
+
 export default defineConfig({
   // مسیر نسبی تا روی زیرپوشه (مثل GitHub Pages) هم کار کنه
   base: './',
@@ -22,6 +24,12 @@ export default defineConfig({
         display: 'standalone',
         background_color: '#f4f5fa',
         theme_color: '#f4f5fa',
+        // نگه‌داشتن انگشت روی آیکن برنامه
+        shortcuts: [
+          shortcut('پروژه‌ی جدید', './#/new'),
+          shortcut('تسویه‌نشده‌ها', './#/projects?filter=unsettled'),
+          shortcut('گزارش‌ها', './#/reports'),
+        ],
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },

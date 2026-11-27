@@ -47,8 +47,8 @@ textarea.input { resize: vertical; line-height: 1.8; }
 [dir='ltr'] .chips--scroll { mask-image: linear-gradient(to left, transparent, #000 28px); }
 .chips--scroll::-webkit-scrollbar { display: none; }
 .chip {
-  display: inline-flex; align-items: center; gap: var(--s1); flex: none;
-  min-height: var(--tap); padding: 0 var(--s3);
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s1); flex: none;
+  min-height: var(--tap); min-width: var(--tap); padding: 0 var(--s3);
   border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface);
   font-size: var(--fs-s); font-weight: 500; white-space: nowrap;
 }
@@ -269,3 +269,16 @@ textarea.input { resize: vertical; line-height: 1.8; }
   .row__action:hover span { background: var(--brand); color: var(--brand-ink); }
   .duelist__done:hover span { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
 }
+
+/* پیگیری، راه‌های تماس و سقف اصلاح */
+.input--message { line-height: 1.9; }
+a.chip { text-decoration: none; }
+.contacts { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--s2); list-style: none; padding: 0; margin: 0 0 var(--s4); }
+.contacts a { display: flex; flex-direction: column; align-items: center; gap: var(--s1); min-height: var(--tap); padding: var(--s3) var(--s1); border-radius: var(--r-m); background: var(--brand-soft); color: var(--brand); font-size: var(--fs-s); font-weight: 600; text-decoration: none; }
+.clients-follow { margin-bottom: var(--s4); }
+.counter__over { color: var(--bad); }
+.revlimit .chips { gap: var(--s1); }
+.line__follow { font-size: var(--fs-xs); font-weight: 600; color: var(--brand); }
+.revnote { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); flex-wrap: wrap; margin: 0; padding: var(--s3); border-radius: var(--r-m); background: var(--surface-2); font-size: var(--fs-s); }
+.revnote--over { background: var(--bad-soft); color: var(--bad); font-weight: 600; }
+.revnote--over .btn { color: var(--ink); }

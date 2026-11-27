@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import DateField from '../components/DateField.jsx'
+import FollowUpNote from '../components/FollowUpNote.jsx'
 import Icon from '../components/Icon.jsx'
+import Revisions from '../components/Revisions.jsx'
 import { BackLink, DueTag, dueText, MoneyBar, StatusButton } from '../components/ui.jsx'
 import { useApp } from '../context/AppContext.jsx'
 import { href, navigate } from '../hooks/useRoute.js'
 import { useStopTimer } from '../hooks/useStopTimer.js'
 import { ITEM_STATUSES } from '../lib/domain/constants.js'
 import { removePayment } from '../lib/domain/payments.js'
-import { addItem, changeRevisions, deleteProject, dueInfo, duplicateProject, nextStep, removeItem, setArchived, setItemStatus, updateProject } from '../lib/domain/projects.js'
+import { addItem, deleteProject, dueInfo, duplicateProject, nextStep, removeItem, setArchived, setItemStatus, updateProject } from '../lib/domain/projects.js'
 import { addTime, removeTime, startTimer } from '../lib/domain/time.js'
 import { restoreItem } from '../lib/domain/undo.js'
 import { extractLinks } from '../lib/format.js'
@@ -35,6 +37,14 @@ function Money({ row }) {
         <button type="button" className="btn btn--primary btn--block" onClick={() => openSheet('payment', { projectId: project.id })}>
           <Icon name="wallet" />{t('pay.add')}
         </button>
+      )}
+      {balance > 0 && (
+        <>
+          <button type="button" className="btn btn--block" onClick={() => openSheet('followUp', { projectId: project.id })}>
+            <Icon name="message" />{t('follow.open')}
+          </button>
+          <FollowUpNote project={project} className="muted" />
+        </>
       )}
       {payments.length > 0 && (
         <ul className="lines" aria-label={t('pay.list')}>
@@ -194,14 +204,7 @@ function Details({ project }) {
     <section className="card" aria-labelledby="details-title">
       <h2 id="details-title">{t('project.details')}</h2>
       <DateField collapsible label={t('f.due')} value={project.dueDate} onChange={(dueDate) => run(updateProject, project.id, { dueDate })} />
-      <div className="counter">
-        <span id="rev-label">{t('project.revisions')}</span>
-        <div className="counter__control" role="group" aria-labelledby="rev-label">
-          <button type="button" className="iconbtn" aria-label={t('project.revMinus')} disabled={!project.revisions} onClick={() => run(changeRevisions, project.id, -1)}><Icon name="minus" /></button>
-          <output aria-live="polite">{fmt.num(project.revisions)}</output>
-          <button type="button" className="iconbtn" aria-label={t('project.revPlus')} onClick={() => run(changeRevisions, project.id, 1)}><Icon name="plus" /></button>
-        </div>
-      </div>
+      <Revisions project={project} />
       <NoteField key={project.id} project={project} />
       <p className="muted meta">
         <span>{t('project.createdOn', { date: fmt.date(project.createdOn) })}</span>

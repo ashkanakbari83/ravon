@@ -3,7 +3,8 @@ import ErrorBoundary from './components/ErrorBoundary.jsx'
 import Layout from './components/Layout.jsx'
 import { useApp } from './context/AppContext.jsx'
 import { LATEST_RELEASE } from './data/releases.js'
-import { scrollTarget, useRoute } from './hooks/useRoute.js'
+import { usePersistentStorage } from './hooks/usePersistentStorage.js'
+import { replaceRoute, scrollTarget, useRoute } from './hooks/useRoute.js'
 import { useShortcuts } from './hooks/useShortcuts.js'
 import Sheets from './modals/Sheets.jsx'
 import Dashboard from './pages/Dashboard.jsx'
@@ -22,7 +23,10 @@ const PAGES = {
 
 export default function App() {
   const { db, t, openSheet, closeSheet, storageError } = useApp()
-  const route = useRoute()
+  const address = useRoute()
+  // میان‌بُرِ آیکن برنامه (#/new): همون خانه، با فرم ثبتِ باز
+  const shortcut = address.name === 'new'
+  const route = shortcut ? { ...address, name: 'home' } : address
   const Page = PAGES[route.name] || NotFound
   const pageKey = `${route.name}/${route.id || ''}`
 
@@ -41,6 +45,15 @@ export default function App() {
   useEffect(() => {
     if (!welcome && !storageError && db.meta.seenRelease < LATEST_RELEASE) openSheet('whatsNew')
   }, [])
+
+  // بعد از دو افکتِ بالا، تا «ثبت» جای «تازه‌ها» رو بگیره (تازه‌ها دفعه‌ی بعد میاد)
+  useEffect(() => {
+    if (!shortcut || welcome) return
+    replaceRoute('')
+    openSheet('quickAdd')
+  }, [shortcut, welcome])
+
+  usePersistentStorage(db.projects.some((p) => !p.demo))
 
   if (welcome) return <Welcome />
   return (
