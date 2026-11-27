@@ -1,3 +1,4 @@
+import { LATEST_RELEASE, RELEASES } from '../../src/data/releases.js'
 import { expect, go, sheet, startDemo, startFresh, state, test } from './fixtures.js'
 
 const news = (page) => page.getByRole('dialog', { name: 'چی تازه شده؟' })
@@ -23,16 +24,17 @@ test('کاربر تازه پنجره‌ی تغییرات نمی‌بینه', asy
 
 test('بعد از به‌روزرسانی یک بار میاد و بعد از بستن دیگه نه', async ({ page }) => {
   await asReturningUser(page)
-  await expect(news(page)).toContainText('روشن/تیره')
+  // فقط تازه‌ترین نسخه، با همه‌ی موردهاش
+  await expect(news(page).locator('.news li')).toHaveCount(RELEASES[0].items.length)
   await expect(news(page).locator('.news')).toHaveCount(1)
   // تا نبسته، دیده‌شده نیست
   await page.reload()
   await expect(news(page)).toBeVisible()
   await news(page).getByRole('button', { name: 'تغییرات قبلی' }).click()
-  await expect(news(page).locator('.news')).toHaveCount(4)
+  await expect(news(page).locator('.news')).toHaveCount(RELEASES.length)
   await news(page).getByRole('button', { name: 'فهمیدم' }).click()
   await expect(sheet(page)).toHaveCount(0)
-  expect((await state(page)).meta.seenRelease).toBe(4)
+  expect((await state(page)).meta.seenRelease).toBe(LATEST_RELEASE)
   await page.reload()
   await expect(page.getByRole('heading', { name: 'مهلت تحویل' })).toBeVisible()
   await expect(sheet(page)).toHaveCount(0)
@@ -45,7 +47,7 @@ test('Esc هم یعنی دیدم؛ و از تنظیمات همیشه در دست
   await expect(sheet(page)).toHaveCount(0)
   await go(page, 'settings')
   await page.getByRole('button', { name: 'تازه‌های رَوون' }).click()
-  await expect(news(page).locator('.news')).toHaveCount(4)
+  await expect(news(page).locator('.news')).toHaveCount(RELEASES.length)
 })
 
 test('مهلت تحویل: دیر و مونده با عدد و کلمه', async ({ page }) => {
