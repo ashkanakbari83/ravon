@@ -11,7 +11,8 @@
 .shell--timer .main { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 96px); }
 
 .nav { position: fixed; z-index: 20; inset-inline: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); height: calc(var(--nav-h) + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); background: var(--surface); border-top: 1px solid var(--line); }
-.nav__brand, .nav__settings, .nav__newLong { display: none; }
+.nav__brand, .nav__theme, .nav__settings, .nav__newLong { display: none; }
+.topbar__actions { display: flex; align-items: center; }
 .nav__tab, .nav__new { display: grid; justify-items: center; align-content: center; gap: 2px; color: var(--ink-2); font-size: 0.75rem; font-weight: 600; line-height: 1.4; white-space: nowrap; }
 .nav__tab[aria-current='page'] { color: var(--brand); font-weight: 800; }
 .nav__plus { display: grid; place-items: center; width: 48px; height: 34px; border-radius: var(--r-m); background: var(--brand); color: var(--brand-ink); }
@@ -153,10 +154,10 @@
   .topbar { display: none; }
   .nav { inset-block: 0; inset-inline: 0 auto; width: var(--side-w); height: auto; display: flex; flex-direction: column; gap: var(--s1); padding: var(--s4) var(--s3); border-top: 0; border-inline-end: 1px solid var(--line); }
   .nav__brand { display: flex; padding-inline: var(--s2); margin-bottom: var(--s4); }
-  .nav__tab, .nav__settings, .nav__new { display: flex; justify-content: flex-start; align-items: center; gap: var(--s3); min-height: 48px; padding-inline: var(--s3); border-radius: var(--r-m); font-size: var(--fs-m); font-weight: 600; color: var(--ink-2); }
-  .nav__tab:hover, .nav__settings:hover { background: var(--surface-2); }
+  .nav__tab, .nav__theme, .nav__settings, .nav__new { display: flex; justify-content: flex-start; align-items: center; gap: var(--s3); min-height: 48px; padding-inline: var(--s3); border-radius: var(--r-m); font-size: var(--fs-m); font-weight: 600; color: var(--ink-2); }
   .nav__tab[aria-current='page'], .nav__settings[aria-current='page'] { background: var(--brand-soft); color: var(--brand); font-weight: 800; }
-  .nav__settings { margin-top: auto; }
+  .nav__theme { margin-top: auto; }
+  @media (hover: hover) { .nav__tab:hover, .nav__theme:hover, .nav__settings:hover { background: var(--surface-2); } }
   .nav__new { order: -1; margin-bottom: var(--s3); background: var(--brand); color: var(--brand-ink); justify-content: center; gap: var(--s2); }
   .nav__brand { order: -2; }
   .nav__plus { width: auto; height: auto; background: none; }

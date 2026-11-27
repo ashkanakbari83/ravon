@@ -6,6 +6,8 @@ export default {
   'news.open': ['تازه‌های رَوون', 'What’s new in RAVON'],
   'news.updateReady': ['نسخه‌ی تازه آماده‌ست', 'A new version is ready'],
   'news.update': ['به‌روزرسانی', 'Update'],
+  'news.v4.dark': ['دکمه‌ی روشن/تیره اومد بالای صفحه.', 'A light/dark button now sits at the top of the screen.'],
+  'news.v4.touch': ['موقع لمس آیکن‌ها دیگه مربع تیره پشتشون نمیاد.', 'No more dark square behind icons when you tap them.'],
   'news.v3.due': ['«مهلت تحویل» واضح‌تر شد: برای هر کار نوشته چند روز دیر شده یا مونده.', 'Deadlines now say how many days each job is late or has left.'],
   'news.v3.colors': ['رنگ‌بندی تازه؛ رنگ برنامه رو هم می‌تونی از تنظیمات عوض کنی.', 'New colors, and you can pick an accent in Settings.'],
   'news.v3.mobile': ['گوشی راحت‌تر شد: کیبورد فرم‌ها رو نمی‌پوشونه، برگه‌ها با کشیدن بسته می‌شن و متن‌ها خواناترن.', 'Better on phones: forms stay above the keyboard, sheets swipe closed, text is easier to read.'],
