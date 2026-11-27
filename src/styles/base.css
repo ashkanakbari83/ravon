@@ -7,7 +7,9 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; padding: 0; }
-html { -webkit-text-size-adjust: 100%; }
+/* بدون این، اندروید و iOS موقع لمس یه مربع تیره پشت لینک‌ها و دکمه‌ها می‌کشن؛
+   بازخورد لمس رو خودمون توی «لمس و موس» می‌دیم */
+html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
 body {
   background: var(--bg);
   color: var(--ink);
@@ -17,7 +19,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 button, input, select, textarea { font: inherit; color: inherit; }
-button { background: none; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button { background: none; border: 0; cursor: pointer; }
 button:disabled { cursor: default; opacity: 0.45; }
 a { color: var(--brand); text-decoration: none; }
 ul, ol { list-style: none; }
