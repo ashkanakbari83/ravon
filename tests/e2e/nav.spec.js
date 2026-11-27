@@ -15,10 +15,10 @@ test('نوار اصلی: همه‌ی تب‌ها و دکمه‌ی ثبت', async
     await expect(page.getByRole('heading', { level: 1, name: heading })).toHaveCount(1)
     await expect(nav.getByRole('link', { name })).toHaveAttribute('aria-current', 'page')
   }
-  await expect(nav.locator('a:visible, button:visible')).toHaveCount(info.project.name === 'mobile' ? 5 : 7)
+  await expect(nav.locator('a:visible, button:visible')).toHaveCount(info.project.name === 'mobile' ? 5 : 8)
   await page.getByRole('link', { name: 'تنظیمات' }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'تنظیمات' })).toBeVisible()
-  await nav.getByRole('button').click()
+  await nav.getByRole('button', { name: /ثبت|پروژه‌ی جدید/ }).click()
   await expect(page.getByRole('dialog', { name: 'پروژه‌ی جدید' })).toBeVisible()
 })
 

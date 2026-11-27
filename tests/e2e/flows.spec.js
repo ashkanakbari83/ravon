@@ -279,7 +279,7 @@ test('پشتیبان و بازیابی', async ({ page }, info) => {
 test('تنظیمات: پوسته و واحد پول می‌مونه', async ({ page }) => {
   await startDemo(page)
   await go(page, 'settings')
-  await page.getByRole('button', { name: 'تیره' }).click()
+  await page.getByRole('button', { name: 'تیره', exact: true }).click()
   await page.getByRole('button', { name: 'ریال' }).click()
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
