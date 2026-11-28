@@ -49,6 +49,9 @@ jobs:
       - name: Generate TWA (Android) project + signing key
         env:
           APP_VERSION_CODE: ${{ inputs.app_version_code }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: npm run android:generate
 
       - name: Build release APK (unsigned)

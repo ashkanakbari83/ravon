@@ -19,8 +19,14 @@
  * Env vars (all optional, used by CI):
  *   ANDROID_HOME / ANDROID_SDK_ROOT - path to the Android SDK
  *   JAVA_HOME                      - path to the JDK
- *   KEYSTORE_PASSWORD              - keystore password (random if unset)
- *   KEY_PASSWORD                   - key password (random if unset)
+ *   ANDROID_KEYSTORE_BASE64        - base64 of an existing .keystore to reuse
+ *                                    (so every build keeps the same signature
+ *                                    and Digital Asset Links verification —
+ *                                    see public/.well-known/assetlinks.json —
+ *                                    keeps matching). Falls back to creating
+ *                                    a brand new keystore if unset.
+ *   ANDROID_KEYSTORE_PASSWORD      - required when ANDROID_KEYSTORE_BASE64 is set
+ *   ANDROID_KEY_PASSWORD           - required when ANDROID_KEYSTORE_BASE64 is set
  *   APP_VERSION_CODE               - override the numeric version code
  */
 
@@ -72,14 +78,24 @@ async function main() {
   const jdkHelper = new JdkHelper(process, config)
   const log = new ConsoleLog('ravon')
 
-  // Modern keystores are PKCS12 by default, which doesn't really support a
-  // key password distinct from the store password (keytool accepts one, but
-  // tools reading it back — e.g. apksigner — fail with a misleading "wrong
-  // password" BadPaddingException). Keep them identical to avoid that.
-  const keystorePassword = process.env.KEYSTORE_PASSWORD || randomPassword()
-  const keyPassword = process.env.KEY_PASSWORD || keystorePassword
+  let keystorePassword
+  let keyPassword
 
-  if (!fs.existsSync(KEYSTORE_PATH)) {
+  if (process.env.ANDROID_KEYSTORE_BASE64) {
+    if (!process.env.ANDROID_KEYSTORE_PASSWORD) {
+      throw new Error('ANDROID_KEYSTORE_PASSWORD must be set alongside ANDROID_KEYSTORE_BASE64.')
+    }
+    fs.writeFileSync(KEYSTORE_PATH, Buffer.from(process.env.ANDROID_KEYSTORE_BASE64, 'base64'))
+    keystorePassword = process.env.ANDROID_KEYSTORE_PASSWORD
+    keyPassword = process.env.ANDROID_KEY_PASSWORD || keystorePassword
+    log.info(`Restored signing key from ANDROID_KEYSTORE_BASE64 at ${KEYSTORE_PATH}`)
+  } else if (!fs.existsSync(KEYSTORE_PATH)) {
+    // Modern keystores are PKCS12 by default, which doesn't really support a
+    // key password distinct from the store password (keytool accepts one,
+    // but tools reading it back — e.g. apksigner — fail with a misleading
+    // "wrong password" BadPaddingException). Keep them identical.
+    keystorePassword = randomPassword()
+    keyPassword = keystorePassword
     const keyTool = new KeyTool(jdkHelper, log)
     await keyTool.createSigningKey({
       path: KEYSTORE_PATH,
@@ -91,10 +107,27 @@ async function main() {
       organization: 'Ravon',
       country: 'IR',
     })
-    log.info(`Created signing key at ${KEYSTORE_PATH}`)
+    log.warn(
+      'Created a NEW, one-off signing key (no ANDROID_KEYSTORE_BASE64 secret set). ' +
+        'This build will not match previously issued APKs or the asset-link fingerprint ' +
+        'published at /.well-known/assetlinks.json.',
+    )
   } else {
-    log.info(`Reusing existing signing key at ${KEYSTORE_PATH}`)
+    throw new Error(`${KEYSTORE_PATH} already exists locally but no password was provided.`)
   }
+
+  // SHA-256 fingerprint of the signing cert — not secret (it's meant to be
+  // published, see public/.well-known/assetlinks.json), safe to print in CI
+  // logs even on a public repo.
+  const { execFileSync } = require('child_process')
+  const keytoolOutput = execFileSync(
+    path.join(jdkHelper.getJavaHome(), 'bin', 'keytool'),
+    ['-list', '-v', '-keystore', KEYSTORE_PATH, '-alias', KEY_ALIAS, '-storepass', keystorePassword],
+    { encoding: 'utf8' },
+  )
+  const sha256Line = keytoolOutput.split('\n').find((l) => l.includes('SHA256:'))
+  const sha256Fingerprint = sha256Line ? sha256Line.split('SHA256:')[1].trim() : '(not found)'
+  log.info(`SHA-256 cert fingerprint: ${sha256Fingerprint}`)
 
   // Write the passwords next to the keystore so the workflow can bundle
   // them together into one artifact. Never committed to git (see .gitignore).
@@ -109,6 +142,7 @@ async function main() {
       `alias         : ${KEY_ALIAS}`,
       `store password: ${keystorePassword}`,
       `key password  : ${keyPassword}`,
+      `SHA-256 fingerprint: ${sha256Fingerprint}`,
       '',
     ].join('\n'),
   )
