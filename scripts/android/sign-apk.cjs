@@ -17,12 +17,31 @@ const ANDROID_DIR = path.join(ROOT, 'android')
 const PROJECT_DIR = path.join(ANDROID_DIR, 'project')
 const CREDS_PATH = path.join(ANDROID_DIR, 'keystore-credentials.json')
 
+// @bubblewrap/core's AndroidSdkTools.validatePath only accepts an SDK root
+// that has a top-level `tools/` or `bin/` directory — a layout Android's own
+// SDK distribution stopped using years ago (now everything lives under
+// `cmdline-tools/<version>/bin`). Satisfy the check with a symlink instead
+// of patching the library.
+function ensureLegacyBinMarker(androidSdkPath) {
+  if (fs.existsSync(path.join(androidSdkPath, 'tools')) || fs.existsSync(path.join(androidSdkPath, 'bin'))) {
+    return
+  }
+  const cmdlineToolsDir = path.join(androidSdkPath, 'cmdline-tools')
+  const versions = fs.existsSync(cmdlineToolsDir) ? fs.readdirSync(cmdlineToolsDir) : []
+  const pick = versions.includes('latest') ? 'latest' : versions.sort().pop()
+  if (!pick) {
+    throw new Error(`Could not find cmdline-tools under ${cmdlineToolsDir} to link a legacy bin/ marker.`)
+  }
+  fs.symlinkSync(path.join(cmdlineToolsDir, pick, 'bin'), path.join(androidSdkPath, 'bin'))
+}
+
 async function main() {
   const androidSdkPath = process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT
   const jdkPath = process.env.JAVA_HOME
   if (!androidSdkPath || !jdkPath) {
     throw new Error('ANDROID_HOME (or ANDROID_SDK_ROOT) and JAVA_HOME must be set in the environment.')
   }
+  ensureLegacyBinMarker(androidSdkPath)
 
   const creds = JSON.parse(fs.readFileSync(CREDS_PATH, 'utf8'))
 
