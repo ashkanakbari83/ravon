@@ -5,11 +5,6 @@ name: Build Android APK
 # Actions tab (or `gh workflow run android-apk.yml`) whenever a new APK is
 # needed for distribution outside Google Play.
 on:
-  # TEMP: lets this run on its own branch for testing, since workflow_dispatch
-  # only becomes dispatchable once this file exists on the default branch.
-  # Remove this `push` trigger once verified working, before merging.
-  push:
-    branches: [chore/android-apk]
   workflow_dispatch:
     inputs:
       app_version_code:
