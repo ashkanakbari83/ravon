@@ -72,8 +72,12 @@ async function main() {
   const jdkHelper = new JdkHelper(process, config)
   const log = new ConsoleLog('ravon')
 
+  // Modern keystores are PKCS12 by default, which doesn't really support a
+  // key password distinct from the store password (keytool accepts one, but
+  // tools reading it back — e.g. apksigner — fail with a misleading "wrong
+  // password" BadPaddingException). Keep them identical to avoid that.
   const keystorePassword = process.env.KEYSTORE_PASSWORD || randomPassword()
-  const keyPassword = process.env.KEY_PASSWORD || randomPassword()
+  const keyPassword = process.env.KEY_PASSWORD || keystorePassword
 
   if (!fs.existsSync(KEYSTORE_PATH)) {
     const keyTool = new KeyTool(jdkHelper, log)
