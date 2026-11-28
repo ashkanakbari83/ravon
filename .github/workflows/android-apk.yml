@@ -32,16 +32,28 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Install Android SDK packages
-        # ubuntu-latest runners already ship an Android SDK at $ANDROID_HOME
-        # with licenses pre-accepted. (android-actions/setup-android tries to
-        # install the long-removed legacy "tools" package and fails on
-        # current SDK versions, so we drive sdkmanager directly instead.)
+      - name: Debug Android SDK location
         run: |
-          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -maxdepth 2 -name sdkmanager | sort -V | tail -1)
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls -la /usr/local/lib/android/sdk 2>&1 || true
+          ls -la /usr/local/lib/android/sdk/cmdline-tools 2>&1 || true
+
+      - name: Install Android SDK packages
+        # ubuntu-latest runners already ship an Android SDK with licenses
+        # pre-accepted. (android-actions/setup-android tries to install the
+        # long-removed legacy "tools" package and fails on current SDK
+        # versions, so we drive sdkmanager directly instead.)
+        run: |
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDKMANAGER=$(find "$SDK_ROOT/cmdline-tools" -maxdepth 2 -name sdkmanager | sort -V | tail -1)
+          echo "SDK_ROOT=$SDK_ROOT"
           echo "Using $SDKMANAGER"
+          test -n "$SDKMANAGER"
           yes | "$SDKMANAGER" --licenses > /dev/null || true
           "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.1.0"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
 
       - name: Install npm dependencies
         run: npm ci
