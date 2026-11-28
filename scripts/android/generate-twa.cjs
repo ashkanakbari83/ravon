@@ -130,6 +130,9 @@ async function main() {
     signingKey: { path: KEYSTORE_PATH, alias: KEY_ALIAS },
     appVersion,
     appVersionCode,
+    // androidbrowserhelper 2.8.0 (the TWA support library) requires API 24+;
+    // the bubblewrap default of 21 fails the manifest merge.
+    minSdkVersion: 24,
     orientation: 'default',
     fallbackType: 'customtabs',
     shortcuts: [
